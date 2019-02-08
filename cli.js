@@ -3,18 +3,7 @@
 const meow = require('meow');
 const captureWebsite = require('capture-website');
 const arrify = require('arrify');
-const toughCookie = require('tough-cookie');
 const splitOnFirst = require('split-on-first');
-
-const parseCookie = cookie => {
-	if (typeof cookie === 'object') {
-		return cookie;
-	}
-
-	const ret = toughCookie.parse(cookie).toJSON();
-	ret.name = ret.key;
-	return ret;
-};
 
 const cli = meow(`
 	Usage
@@ -157,7 +146,7 @@ for (const header of arrify(options.header)) {
 	options.headers[key.trim()] = value.trim();
 }
 
-options.cookies = arrify(options.cookie).map(value => parseCookie(value));
+options.cookies = arrify(options.cookie);
 
 if (options.authentication) {
 	const [username, password] = splitOnFirst(options.authentication, ':');

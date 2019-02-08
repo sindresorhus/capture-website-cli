@@ -45,9 +45,5 @@ test('check flags', async t => {
 
 	const {stdout} = await execa('./cli.js', ['--internal-print-flags', ...flags]);
 	const json = JSON.parse(stdout);
-
-	// Remove dynamic content that cannot be snapshotted
-	delete json.cookies[0].creation;
-
 	t.snapshot(json);
 });

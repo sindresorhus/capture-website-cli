@@ -40,10 +40,9 @@
 	],
 	"dependencies": {
 		"arrify": "^1.0.1",
-		"capture-website": "^0.1.0",
+		"capture-website": "^0.1.2",
 		"meow": "^5.0.0",
-		"split-on-first": "^1.0.0",
-		"tough-cookie": "^3.0.1"
+		"split-on-first": "^1.0.0"
 	},
 	"devDependencies": {
 		"ava": "^1.2.0",
