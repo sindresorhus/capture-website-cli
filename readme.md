@@ -51,6 +51,7 @@ $ capture-website --help
     --cookie                 Set a cookie (Can be set multiple times)
     --authentication         Credentials for HTTP authentication
     --debug                  Show the browser window to see what it's doing
+    --overwrite              Overwrite the destination file if it exists
 
   Examples
     $ capture-website https://sindresorhus.com screenshot.png
