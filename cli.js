@@ -140,6 +140,8 @@ const cli = meow(`
 const [input, output] = cli.input;
 const options = cli.flags;
 
+options.hideElements = arrify(options.hideElements);
+options.removeElements = arrify(options.removeElements);
 options.modules = arrify(options.module);
 options.scripts = arrify(options.script);
 options.styles = arrify(options.style);
