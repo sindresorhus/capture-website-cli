@@ -43,6 +43,7 @@ $ capture-website --help
     --element                Capture the DOM element matching the CSS selector. It will wait for the element to appear in the page and to be visible.
     --hide-elements          Hide DOM elements matching the CSS selector (Can be set multiple times)
     --remove-elements        Remove DOM elements matching the CSS selector (Can be set multiple times)
+    --click-element          Click DOM element matching the CSS selector
     --module                 Inject a JavaScript module into the page. Can be inline code, absolute URL, and local file path with `.js` extension. (Can be set multiple times)
     --scripts                Same as `--modules`, but instead injects the code as a classic script
     --style                  Inject CSS styles into the page. Can be inline code, absolute URL, and local file path with `.css` extension. (Can be set multiple times)
@@ -69,6 +70,7 @@ $ capture-website --help
     --wait-for-element="#header"
     --element=".main-content"
     --hide-elements=".sidebar"
+    --click-element="button"
     --remove-elements="img.ad"
     --module=https://sindresorhus.com/remote-file.js
     --module=local-file.js
