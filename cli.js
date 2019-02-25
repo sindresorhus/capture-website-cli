@@ -35,6 +35,7 @@ const cli = meow(`
 	  --authentication         Credentials for HTTP authentication
 	  --debug                  Show the browser window to see what it's doing
 	  --overwrite              Overwrite the destination file if it exists
+	  --inset                  Ignore certain pixels at the top of the page, but if  \`--element\` is defined it will include pixel around it
 
 	Examples
 	  $ capture-website https://sindresorhus.com screenshot.png
@@ -60,6 +61,8 @@ const cli = meow(`
 	  --user-agent="I love unicorns"
 	  --cookie="id=unicorn; Expires=Wed, 21 Oct 2018 07:28:00 GMT;"
 	  --authentication="username:password"
+	  --inset=100
+	  --element=".main-content" --inset=-10
 `, {
 	flags: {
 		width: {
@@ -133,6 +136,9 @@ const cli = meow(`
 		},
 		overwrite: {
 			type: 'boolean'
+		},
+		inset: {
+			type: 'number'
 		}
 	}
 });
@@ -157,6 +163,10 @@ options.cookies = arrify(options.cookie);
 if (options.authentication) {
 	const [username, password] = splitOnFirst(options.authentication, ':');
 	options.authentication = {username, password};
+}
+
+if (!options.element && options.inset) {
+	options.inset = {top: options.inset};
 }
 
 (async () => {
