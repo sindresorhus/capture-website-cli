@@ -52,7 +52,7 @@ $ capture-website --help
     --authentication         Credentials for HTTP authentication
     --debug                  Show the browser window to see what it's doing
     --overwrite              Overwrite the destination file if it exists
-		--inset                  Ignore certain pixels at the top of the page, but if  \`--element\` is defined it will include pixel around it
+    --inset                  Ignore certain pixels at the top of the page, but if  \`--element\` is defined it will include pixel around it
 
   Examples
     $ capture-website https://sindresorhus.com screenshot.png
@@ -78,8 +78,8 @@ $ capture-website --help
     --user-agent="I love unicorns"
     --cookie="id=unicorn; Expires=Wed, 21 Oct 2018 07:28:00 GMT;"
     --authentication="username:password"
-		--inset=100
-	  --element=".main-content" --inset=-10
+    --inset=100
+    --element=".main-content" --inset=-10
 ```
 
 
