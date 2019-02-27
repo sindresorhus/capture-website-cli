@@ -26,6 +26,7 @@ const cli = meow(`
 	  --element                Capture the DOM element matching the CSS selector. It will wait for the element to appear in the page and to be visible.
 	  --hide-elements          Hide DOM elements matching the CSS selector (Can be set multiple times)
 	  --remove-elements        Remove DOM elements matching the CSS selector (Can be set multiple times)
+	  --click-element          Click the DOM element matching the CSS selector
 	  --module                 Inject a JavaScript module into the page. Can be inline code, absolute URL, and local file path with \`.js\` extension. (Can be set multiple times)
 	  --scripts                Same as \`--modules\`, but instead injects the code as a classic script
 	  --style                  Inject CSS styles into the page. Can be inline code, absolute URL, and local file path with \`.css\` extension. (Can be set multiple times)
@@ -53,6 +54,7 @@ const cli = meow(`
 	  --element=".main-content"
 	  --hide-elements=".sidebar"
 	  --remove-elements="img.ad"
+	  --click-element="button"
 	  --module=https://sindresorhus.com/remote-file.js
 	  --module=local-file.js
 	  --module="document.body.style.backgroundColor = 'red'"
@@ -105,6 +107,9 @@ const cli = meow(`
 			type: 'string'
 		},
 		removeElements: {
+			type: 'string'
+		},
+		clickElement: {
 			type: 'string'
 		},
 		module: {
