@@ -36,7 +36,7 @@ const cli = meow(`
 	  --authentication         Credentials for HTTP authentication
 	  --debug                  Show the browser window to see what it's doing
 	  --overwrite              Overwrite the destination file if it exists
-	  --launch-options         JSON formatted puppeteer launch options
+	  --launch-options         Puppeteer launch options as JSON
 
 	Examples
 	  $ capture-website https://sindresorhus.com screenshot.png
