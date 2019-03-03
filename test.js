@@ -40,7 +40,7 @@ test('check flags', async t => {
 --user-agent="I love unicorns"
 --cookie="id=unicorn; Expires=Wed, 21 Oct 2018 07:28:00 GMT;"
 --authentication="username:password"
---launch-options="{ \\"headless\\": false }"
+--launch-options="{\\"headless\\": false}"
 	`;
 
 	flags = flags.trim()
