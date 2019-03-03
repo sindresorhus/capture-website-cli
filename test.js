@@ -44,7 +44,7 @@ test('check flags', async t => {
 	`;
 
 	flags = flags.trim()
-		.replace(/[^\\]"/g, '')
+		.replace(/(?<==)"|(?<!\\)"$/gm, '')
 		.replace(/\\"/g, '"')
 		.split('\n');
 
