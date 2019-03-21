@@ -37,6 +37,7 @@ const cli = meow(`
 	  --debug                  Show the browser window to see what it's doing
 	  --overwrite              Overwrite the destination file if it exists
 	  --launch-options         Puppeteer launch options as JSON
+	  --clip                   An object which specifies clipping region of the page.
 
 	Examples
 	  $ capture-website https://sindresorhus.com screenshot.png
@@ -64,6 +65,7 @@ const cli = meow(`
 	  --cookie="id=unicorn; Expires=Wed, 21 Oct 2018 07:28:00 GMT;"
 	  --authentication="username:password"
 	  --launch-options='{"headless": false}'
+	  --clip='{"x": 10, "y": 30, "height": 300, "width": 1024}
 `, {
 	flags: {
 		width: {
@@ -100,6 +102,9 @@ const cli = meow(`
 			type: 'number'
 		},
 		waitForElement: {
+			type: 'string'
+		},
+		clip: {
 			type: 'string'
 		},
 		element: {
@@ -158,6 +163,10 @@ options.styles = arrify(options.style);
 
 if (options.launchOptions) {
 	options.launchOptions = JSON.parse(options.launchOptions);
+}
+
+if (options.clip) {
+	options.clip = JSON.parse(options.clip);
 }
 
 options.headers = {};

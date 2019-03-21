@@ -54,6 +54,7 @@ $ capture-website --help
     --debug                  Show the browser window to see what it's doing
     --overwrite              Overwrite the destination file if it exists
     --launch-options         Puppeteer launch options as JSON
+	  --clip                   An object which specifies clipping region of the page.    
 
   Examples
     $ capture-website https://sindresorhus.com screenshot.png
@@ -81,6 +82,7 @@ $ capture-website --help
     --cookie="id=unicorn; Expires=Wed, 21 Oct 2018 07:28:00 GMT;"
     --authentication="username:password"
     --launch-options='{"headless": false}'
+    --clip='{x: 10, y: 30, height: 300, width: 1024}
 ```
 
 
