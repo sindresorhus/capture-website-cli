@@ -36,6 +36,7 @@ const cli = meow(`
 	  --authentication         Credentials for HTTP authentication
 	  --debug                  Show the browser window to see what it's doing
 	  --overwrite              Overwrite the destination file if it exists
+	  --launch-options         Puppeteer launch options as JSON
 
 	Examples
 	  $ capture-website https://sindresorhus.com screenshot.png
@@ -62,6 +63,7 @@ const cli = meow(`
 	  --user-agent="I love unicorns"
 	  --cookie="id=unicorn; Expires=Wed, 21 Oct 2018 07:28:00 GMT;"
 	  --authentication="username:password"
+	  --launch-options='{"headless": false}'
 `, {
 	flags: {
 		width: {
@@ -138,6 +140,9 @@ const cli = meow(`
 		},
 		overwrite: {
 			type: 'boolean'
+		},
+		launchOptions: {
+			type: 'string'
 		}
 	}
 });
@@ -150,6 +155,10 @@ options.removeElements = arrify(options.removeElements);
 options.modules = arrify(options.module);
 options.scripts = arrify(options.script);
 options.styles = arrify(options.style);
+
+if (options.launchOptions) {
+	options.launchOptions = JSON.parse(options.launchOptions);
+}
 
 options.headers = {};
 for (const header of arrify(options.header)) {
