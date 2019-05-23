@@ -150,6 +150,11 @@ const cli = meow(`
 const [input, output] = cli.input;
 const options = cli.flags;
 
+if (!input) {
+	console.error('Please specify a URL or file path');
+	process.exit(1);
+}
+
 options.hideElements = arrify(options.hideElements);
 options.removeElements = arrify(options.removeElements);
 options.modules = arrify(options.module);

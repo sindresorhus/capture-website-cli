@@ -48,7 +48,7 @@ test('check flags', async t => {
 		.replace(/\\"/g, '"')
 		.split('\n');
 
-	const {stdout} = await execa('./cli.js', ['--internal-print-flags', ...flags]);
+	const {stdout} = await execa('./cli.js', ['noop-file', '--internal-print-flags', ...flags]);
 	const json = JSON.parse(stdout);
 	t.snapshot(json);
 });
