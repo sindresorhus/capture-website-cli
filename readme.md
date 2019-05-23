@@ -13,10 +13,6 @@ $ npm install --global capture-website-cli
 
 Note to Linux users: If you get a "No usable sandbox!" error, you need to enable [system sandboxing](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#setting-up-chrome-linux-sandbox).
 
-<a href="https://www.patreon.com/sindresorhus">
-	<img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
-</a>
-
 
 ## Usage
 
@@ -88,8 +84,3 @@ $ capture-website --help
 
 - [capture-website](https://github.com/sindresorhus/capture-website) - API for this module
 - [pageres-cli](https://github.com/sindresorhus/pageres-cli) - A different take on screenshotting websites
-
-
-## License
-
-MIT © [Sindre Sorhus](https://sindresorhus.com)
