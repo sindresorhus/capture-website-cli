@@ -40,6 +40,7 @@ $ capture-website --help
     --hide-elements          Hide DOM elements matching the CSS selector (Can be set multiple times)
     --remove-elements        Remove DOM elements matching the CSS selector (Can be set multiple times)
     --click-element          Click the DOM element matching the CSS selector
+    --scroll-to-element      Scroll to the DOM element matching the CSS selector
     --module                 Inject a JavaScript module into the page. Can be inline code, absolute URL, and local file path with `.js` extension. (Can be set multiple times)
     --scripts                Same as `--modules`, but instead injects the code as a classic script
     --style                  Inject CSS styles into the page. Can be inline code, absolute URL, and local file path with `.css` extension. (Can be set multiple times)
@@ -68,6 +69,7 @@ $ capture-website --help
     --element=".main-content"
     --hide-elements=".sidebar"
     --click-element="button"
+    --scroll-to-element="#map"
     --remove-elements="img.ad"
     --module=https://sindresorhus.com/remote-file.js
     --module=local-file.js

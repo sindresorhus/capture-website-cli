@@ -33,6 +33,7 @@ test('check flags', async t => {
 --hide-elements=".sidebar"
 --remove-elements="img.ad"
 --click-element="button"
+--scroll-to-element="#map"
 --module=https://sindresorhus.com/remote-file.js
 --module=local-file.js
 --module="document.body.style.backgroundColor = 'red'"
