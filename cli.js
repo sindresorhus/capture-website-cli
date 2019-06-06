@@ -57,7 +57,7 @@ const cli = meow(`
 	  --hide-elements=".sidebar"
 	  --remove-elements="img.ad"
 	  --click-element="button"
-	  --disable-animations=true
+	  --disable-animations
 	  --module=https://sindresorhus.com/remote-file.js
 	  --module=local-file.js
 	  --module="document.body.style.backgroundColor = 'red'"
