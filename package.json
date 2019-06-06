@@ -39,16 +39,16 @@
 		"jpg"
 	],
 	"dependencies": {
-		"arrify": "^1.0.1",
-		"capture-website": "^0.3.0",
+		"arrify": "^2.0.1",
+		"capture-website": "^0.4.0",
 		"meow": "^5.0.0",
 		"split-on-first": "^1.0.0"
 	},
 	"devDependencies": {
-		"ava": "^1.2.0",
-		"create-test-server": "^2.4.0",
+		"ava": "^2.0.0",
+		"create-test-server": "^3.0.1",
 		"execa": "^1.0.0",
-		"file-type": "^10.7.1",
+		"file-type": "^11.1.0",
 		"xo": "^0.24.0"
 	}
 }

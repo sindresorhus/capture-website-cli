@@ -34,6 +34,7 @@ test('check flags', async t => {
 --remove-elements="img.ad"
 --click-element="button"
 --scroll-to-element="#map"
+--disable-animations
 --module=https://sindresorhus.com/remote-file.js
 --module=local-file.js
 --module="document.body.style.backgroundColor = 'red'"
