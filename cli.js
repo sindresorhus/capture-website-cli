@@ -27,6 +27,7 @@ const cli = meow(`
 	  --hide-elements          Hide DOM elements matching the CSS selector (Can be set multiple times)
 	  --remove-elements        Remove DOM elements matching the CSS selector (Can be set multiple times)
 	  --click-element          Click the DOM element matching the CSS selector
+	  --scroll-to-element      Scroll to the DOM element matching the CSS selector
 	  --disable-animations     Disable CSS animations and transitions  [default: false]
 	  --module                 Inject a JavaScript module into the page. Can be inline code, absolute URL, and local file path with \`.js\` extension. (Can be set multiple times)
 	  --scripts                Same as \`--modules\`, but instead injects the code as a classic script
@@ -57,6 +58,7 @@ const cli = meow(`
 	  --hide-elements=".sidebar"
 	  --remove-elements="img.ad"
 	  --click-element="button"
+	  --scroll-to-element="#map"
 	  --disable-animations
 	  --module=https://sindresorhus.com/remote-file.js
 	  --module=local-file.js
@@ -114,6 +116,9 @@ const cli = meow(`
 			type: 'string'
 		},
 		clickElement: {
+			type: 'string'
+		},
+		scrollToElement: {
 			type: 'string'
 		},
 		disableAnimations: {
