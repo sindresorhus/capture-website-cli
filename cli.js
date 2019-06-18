@@ -19,6 +19,7 @@ const cli = meow(`
 	  --scale-factor           Scale the webpage \`n\` times  [default: 2]
 	  --list-devices           Output a list of supported devices to emulate
 	  --emulate-device         Capture as if it were captured on the given device
+	  --full-page              Capture the full scrollable page, not just the viewport
 	  --no-default-background  Make the default background transparent
 	  --timeout                Seconds before giving up trying to load the page. Specify \`0\` to disable.  [default: 60]
 	  --delay                  Seconds to wait after the page finished loading before capturing the screenshot  [default: 0]
@@ -30,15 +31,15 @@ const cli = meow(`
 	  --scroll-to-element      Scroll to the DOM element matching the CSS selector
 	  --disable-animations     Disable CSS animations and transitions  [default: false]
 	  --module                 Inject a JavaScript module into the page. Can be inline code, absolute URL, and local file path with \`.js\` extension. (Can be set multiple times)
-	  --scripts                Same as \`--modules\`, but instead injects the code as a classic script
+	  --script                 Same as \`--module\`, but instead injects the code as a classic script
 	  --style                  Inject CSS styles into the page. Can be inline code, absolute URL, and local file path with \`.css\` extension. (Can be set multiple times)
 	  --header                 Set a custom HTTP header (Can be set multiple times)
 	  --user-agent             Set the user agent
 	  --cookie                 Set a cookie (Can be set multiple times)
 	  --authentication         Credentials for HTTP authentication
 	  --debug                  Show the browser window to see what it's doing
-	  --overwrite              Overwrite the destination file if it exists
 	  --launch-options         Puppeteer launch options as JSON
+	  --overwrite              Overwrite the destination file if it exists
 
 	Examples
 	  $ capture-website https://sindresorhus.com screenshot.png
@@ -94,7 +95,7 @@ const cli = meow(`
 		fullPage: {
 			type: 'boolean'
 		},
-		includeBackground: {
+		defaultBackground: {
 			type: 'boolean'
 		},
 		timeout: {
@@ -133,13 +134,13 @@ const cli = meow(`
 		style: {
 			type: 'string'
 		},
-		headers: {
+		header: {
 			type: 'string'
 		},
 		userAgent: {
 			type: 'string'
 		},
-		cookies: {
+		cookie: {
 			type: 'string'
 		},
 		authentication: {
@@ -148,11 +149,11 @@ const cli = meow(`
 		debug: {
 			type: 'boolean'
 		},
-		overwrite: {
-			type: 'boolean'
-		},
 		launchOptions: {
 			type: 'string'
+		},
+		overwrite: {
+			type: 'boolean'
 		}
 	}
 });
