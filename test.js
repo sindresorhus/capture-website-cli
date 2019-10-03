@@ -35,7 +35,7 @@ test('check flags', async t => {
 --click-element="button"
 --scroll-to-element="#map"
 --disable-animations
---is-javascript-enabled=true
+--no-javascript
 --module=https://sindresorhus.com/remote-file.js
 --module=local-file.js
 --module="document.body.style.backgroundColor = 'red'"
