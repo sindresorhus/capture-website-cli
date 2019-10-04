@@ -171,8 +171,8 @@ delete options.html;
 if (!input) {
 	console.error(
 		isHTMLInput ?
-		'Please specify HTML code' :
-		'Please specify a URL or file path'
+			'Please specify HTML code' :
+			'Please specify a URL or file path'
 	);
 	process.exit(1);
 }
