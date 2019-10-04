@@ -7,11 +7,12 @@ const splitOnFirst = require('split-on-first');
 
 const cli = meow(`
 	Usage
-	  $ capture-website <url|file> [output-file]
+	  $ capture-website <url|file|HTML> [output-file]
 
 	  The screenshot will be written to stdout if there's no output file argument
 
 	Options
+	  --html                   Set input type to \`html\`
 	  --width                  Page width  [default: 1280]
 	  --height                 Page height  [default: 800]
 	  --type                   Image type: png|jpeg  [default: png]
@@ -44,6 +45,7 @@ const cli = meow(`
 	Examples
 	  $ capture-website https://sindresorhus.com screenshot.png
 	  $ capture-website index.html screenshot.png
+	  $ capture-website "<h1>Unicorn</h1>" screenshot.png --html
 
 	Flag examples
 	  --width=1000
@@ -71,6 +73,9 @@ const cli = meow(`
 	  --launch-options='{"headless": false}'
 `, {
 	flags: {
+		html: {
+			type: 'boolean'
+		},
 		width: {
 			type: 'number'
 		},
@@ -171,6 +176,10 @@ options.removeElements = arrify(options.removeElements);
 options.modules = arrify(options.module);
 options.scripts = arrify(options.script);
 options.styles = arrify(options.style);
+if (options.html) {
+	options.inputType = 'html';
+}
+delete options.html;
 
 if (options.launchOptions) {
 	options.launchOptions = JSON.parse(options.launchOptions);

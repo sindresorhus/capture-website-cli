@@ -20,11 +20,12 @@ Note to Linux users: If you get a "No usable sandbox!" error, you need to enable
 $ capture-website --help
 
   Usage
-    $ capture-website <url|file> [output-file]
+    $ capture-website <url|file|HTML> [output-file]
 
     The screenshot will be written to stdout if there's no output file argument
 
   Options
+    --html                   Set input type to \`html\`
     --width                  Page width  [default: 1280]
     --height                 Page height  [default: 800]
     --type                   Image type: png|jpeg  [default: png]
@@ -57,6 +58,7 @@ $ capture-website --help
   Examples
     $ capture-website https://sindresorhus.com screenshot.png
     $ capture-website index.html screenshot.png
+	  $ capture-website "<h1>Unicorn</h1>" screenshot.png --html
 
   Flag examples
     --width=1000

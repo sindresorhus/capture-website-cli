@@ -17,6 +17,12 @@ test('main', async t => {
 	await server.close();
 });
 
+test('support HTML input', async t => {
+	const html = '<h1>Unicorn</h1>';
+	const {stdout} = await execa('./cli.js', [html, '--html'], {encoding: 'buffer'});
+	t.is(fileType(stdout).mime, 'image/png');
+});
+
 test('check flags', async t => {
 	// Copied from `cli.js`
 	let flags = `
