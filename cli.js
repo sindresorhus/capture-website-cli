@@ -165,9 +165,15 @@ const cli = meow(`
 
 const [input, output] = cli.input;
 const options = cli.flags;
+const isHTMLInput = options.html;
+delete options.html;
 
 if (!input) {
-	console.error('Please specify a URL or file path');
+	console.error(
+		isHTMLInput ?
+		'Please specify HTML code' :
+		'Please specify a URL or file path'
+	);
 	process.exit(1);
 }
 
@@ -176,10 +182,9 @@ options.removeElements = arrify(options.removeElements);
 options.modules = arrify(options.module);
 options.scripts = arrify(options.script);
 options.styles = arrify(options.style);
-if (options.html) {
+if (isHTMLInput) {
 	options.inputType = 'html';
 }
-delete options.html;
 
 if (options.launchOptions) {
 	options.launchOptions = JSON.parse(options.launchOptions);
