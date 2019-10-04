@@ -12,7 +12,7 @@ const cli = meow(`
 	  The screenshot will be written to stdout if there's no output file argument
 
 	Options
-	  --html                   Set input type to \`html\`
+	  --html                   Set input type to \`html\`  [default: false]
 	  --width                  Page width  [default: 1280]
 	  --height                 Page height  [default: 800]
 	  --type                   Image type: png|jpeg  [default: png]
