@@ -129,7 +129,7 @@ const cli = meow(`
 		},
 		javascript: {
 			type: 'boolean',
-			default: true,
+			default: true
 		},
 		module: {
 			type: 'string'
