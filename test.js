@@ -19,13 +19,17 @@ test('main', async t => {
 
 test('support HTML input', async t => {
 	const html = '<h1>Unicorn</h1>';
-	const {stdout} = await execa('./cli.js', [html, '--html'], {encoding: 'buffer'});
+	const {stdout} = await execa('./cli.js', [], {
+		input: html,
+		encoding: 'buffer'
+	});
 	t.is(fileType(stdout).mime, 'image/png');
 });
 
 test('check flags', async t => {
 	// Copied from `cli.js`
 	let flags = `
+--output=screenshot.png
 --width=1000
 --height=600
 --type=jpeg.

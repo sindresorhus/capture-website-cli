@@ -4,15 +4,15 @@ const meow = require('meow');
 const captureWebsite = require('capture-website');
 const arrify = require('arrify');
 const splitOnFirst = require('split-on-first');
+const getStdin = require('get-stdin');
 
 const cli = meow(`
 	Usage
-	  $ capture-website <url|file|HTML> [output-file]
-
-	  The screenshot will be written to stdout if there's no output file argument
+	  $ capture-website <url|file>
+	  $ echo "<h1>Unicorn</h1>" | capture-website
 
 	Options
-	  --html                   Set input type to \`html\`  [default: false]
+	  --output                 Image filename, if there's no output file, screenshot will be written to stdout
 	  --width                  Page width  [default: 1280]
 	  --height                 Page height  [default: 800]
 	  --type                   Image type: png|jpeg  [default: png]
@@ -43,11 +43,12 @@ const cli = meow(`
 	  --overwrite              Overwrite the destination file if it exists
 
 	Examples
-	  $ capture-website https://sindresorhus.com screenshot.png
-	  $ capture-website index.html screenshot.png
-	  $ capture-website "<h1>Unicorn</h1>" screenshot.png --html
+	  $ capture-website https://sindresorhus.com --output=screenshot.png
+	  $ capture-website index.html --output=screenshot.png
+	  $ echo "<h1>Unicorn</h1>" | capture-website --output=screenshot.png
 
 	Flag examples
+	  --output=screenshot.png
 	  --width=1000
 	  --height=600
 	  --type=jpeg
@@ -73,8 +74,8 @@ const cli = meow(`
 	  --launch-options='{"headless": false}'
 `, {
 	flags: {
-		html: {
-			type: 'boolean'
+		output: {
+			type: 'string'
 		},
 		width: {
 			type: 'number'
@@ -163,28 +164,14 @@ const cli = meow(`
 	}
 });
 
-const [input, output] = cli.input;
+let [input] = cli.input;
 const options = cli.flags;
-const isHTMLInput = options.html;
-delete options.html;
-
-if (!input) {
-	console.error(
-		isHTMLInput ?
-			'Please specify HTML code' :
-			'Please specify a URL or file path'
-	);
-	process.exit(1);
-}
 
 options.hideElements = arrify(options.hideElements);
 options.removeElements = arrify(options.removeElements);
 options.modules = arrify(options.module);
 options.scripts = arrify(options.script);
 options.styles = arrify(options.style);
-if (isHTMLInput) {
-	options.inputType = 'html';
-}
 
 if (options.launchOptions) {
 	options.launchOptions = JSON.parse(options.launchOptions);
@@ -204,14 +191,30 @@ if (options.authentication) {
 }
 
 (async () => {
-	if (options.internalPrintFlags) {
+	const {
+		internalPrintFlags,
+		listDevices,
+		output
+	} = options;
+
+	if (internalPrintFlags) {
 		console.log(JSON.stringify(options));
 		return;
 	}
 
-	if (options.listDevices) {
+	if (listDevices) {
 		console.log(captureWebsite.devices.join('\n'));
 		return;
+	}
+
+	if (!input) {
+		input = await getStdin();
+		options.inputType = 'html';
+	}
+
+	if (!input) {
+		console.error('Please specify a URL, file path or HTML');
+		process.exit(1);
 	}
 
 	if (output) {
