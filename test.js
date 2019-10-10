@@ -18,9 +18,8 @@ test('main', async t => {
 });
 
 test('support HTML input', async t => {
-	const html = '<h1>Unicorn</h1>';
 	const {stdout} = await execa('./cli.js', [], {
-		input: html,
+		input: '<h1>Unicorn</h1>',
 		encoding: 'buffer'
 	});
 	t.is(fileType(stdout).mime, 'image/png');
