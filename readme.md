@@ -24,8 +24,7 @@ $ capture-website --help
     $ echo "<h1>Unicorn</h1>" | capture-website
 
   Options
-    --output                 Image filename, if omitted, screenshot will be written to stdout
-    --html                   Set input type to \`html\`  [default: false]
+    --output                 Image file path (writes it to stdout if omitted)
     --width                  Page width  [default: 1280]
     --height                 Page height  [default: 800]
     --type                   Image type: png|jpeg  [default: png]
