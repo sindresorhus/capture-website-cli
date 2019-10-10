@@ -30,6 +30,7 @@ const cli = meow(`
 	  --click-element          Click the DOM element matching the CSS selector
 	  --scroll-to-element      Scroll to the DOM element matching the CSS selector
 	  --disable-animations     Disable CSS animations and transitions  [default: false]
+	  --no-javascript          Disable JavaScript execution (does not affect --module/--script)
 	  --module                 Inject a JavaScript module into the page. Can be inline code, absolute URL, and local file path with \`.js\` extension. (Can be set multiple times)
 	  --script                 Same as \`--module\`, but instead injects the code as a classic script
 	  --style                  Inject CSS styles into the page. Can be inline code, absolute URL, and local file path with \`.css\` extension. (Can be set multiple times)
@@ -61,6 +62,7 @@ const cli = meow(`
 	  --click-element="button"
 	  --scroll-to-element="#map"
 	  --disable-animations
+	  --no-javascript
 	  --module=https://sindresorhus.com/remote-file.js
 	  --module=local-file.js
 	  --module="document.body.style.backgroundColor = 'red'"
@@ -125,6 +127,10 @@ const cli = meow(`
 		disableAnimations: {
 			type: 'boolean'
 		},
+		javascript: {
+			type: 'boolean',
+			default: true
+		},
 		module: {
 			type: 'string'
 		},
@@ -188,6 +194,8 @@ if (options.authentication) {
 	const [username, password] = splitOnFirst(options.authentication, ':');
 	options.authentication = {username, password};
 }
+
+options.isJavaScriptEnabled = options.javascript;
 
 (async () => {
 	if (options.internalPrintFlags) {
