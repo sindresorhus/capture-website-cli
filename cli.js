@@ -12,7 +12,7 @@ const cli = meow(`
 	  $ echo "<h1>Unicorn</h1>" | capture-website
 
 	Options
-	  --output                 Image filename, if there's no output file, screenshot will be written to stdout
+	  --output                 Image filename, if omitted, screenshot will be written to stdout
 	  --width                  Page width  [default: 1280]
 	  --height                 Page height  [default: 800]
 	  --type                   Image type: png|jpeg  [default: png]
