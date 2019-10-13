@@ -4,14 +4,15 @@ const meow = require('meow');
 const captureWebsite = require('capture-website');
 const arrify = require('arrify');
 const splitOnFirst = require('split-on-first');
+const getStdin = require('get-stdin');
 
 const cli = meow(`
 	Usage
-	  $ capture-website <url|file> [output-file]
-
-	  The screenshot will be written to stdout if there's no output file argument
+	  $ capture-website <url|file>
+	  $ echo "<h1>Unicorn</h1>" | capture-website
 
 	Options
+	  --output                 Image file path (writes it to stdout if omitted)
 	  --width                  Page width  [default: 1280]
 	  --height                 Page height  [default: 800]
 	  --type                   Image type: png|jpeg  [default: png]
@@ -43,10 +44,12 @@ const cli = meow(`
 	  --overwrite              Overwrite the destination file if it exists
 
 	Examples
-	  $ capture-website https://sindresorhus.com screenshot.png
-	  $ capture-website index.html screenshot.png
+	  $ capture-website https://sindresorhus.com --output=screenshot.png
+	  $ capture-website index.html --output=screenshot.png
+	  $ echo "<h1>Unicorn</h1>" | capture-website --output=screenshot.png
 
 	Flag examples
+	  --output=screenshot.png
 	  --width=1000
 	  --height=600
 	  --type=jpeg
@@ -73,6 +76,9 @@ const cli = meow(`
 	  --launch-options='{"headless": false}'
 `, {
 	flags: {
+		output: {
+			type: 'string'
+		},
 		width: {
 			type: 'number'
 		},
@@ -164,13 +170,8 @@ const cli = meow(`
 	}
 });
 
-const [input, output] = cli.input;
+let [input] = cli.input;
 const options = cli.flags;
-
-if (!input) {
-	console.error('Please specify a URL or file path');
-	process.exit(1);
-}
 
 options.hideElements = arrify(options.hideElements);
 options.removeElements = arrify(options.removeElements);
@@ -198,14 +199,30 @@ if (options.authentication) {
 options.isJavaScriptEnabled = options.javascript;
 
 (async () => {
-	if (options.internalPrintFlags) {
+	const {
+		internalPrintFlags,
+		listDevices,
+		output
+	} = options;
+
+	if (internalPrintFlags) {
 		console.log(JSON.stringify(options));
 		return;
 	}
 
-	if (options.listDevices) {
+	if (listDevices) {
 		console.log(captureWebsite.devices.join('\n'));
 		return;
+	}
+
+	if (!input) {
+		input = await getStdin();
+		options.inputType = 'html';
+	}
+
+	if (!input) {
+		console.error('Please specify a URL, file path or HTML');
+		process.exit(1);
 	}
 
 	if (output) {
