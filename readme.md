@@ -59,7 +59,7 @@ $ capture-website --help
     $ capture-website https://sindresorhus.com --output=screenshot.png
     $ capture-website index.html --output=screenshot.png
     $ echo "<h1>Unicorn</h1>" | capture-website --output=screenshot.png
-		$ capture-website https://sindresorhus.com | open -f -a /Applications/Preview.app
+    $ capture-website https://sindresorhus.com | open -f -a /Applications/Preview.app
 
   Flag examples
     --width=1000
