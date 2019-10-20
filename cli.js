@@ -47,7 +47,6 @@ const cli = meow(`
 	  $ capture-website https://sindresorhus.com --output=screenshot.png
 	  $ capture-website index.html --output=screenshot.png
 	  $ echo "<h1>Unicorn</h1>" | capture-website --output=screenshot.png
-          $ capture-website https://sindresorhus.com | open -f -a Preview
 
 	Flag examples
 	  --output=screenshot.png
