@@ -40,7 +40,7 @@
 	],
 	"dependencies": {
 		"arrify": "^2.0.1",
-		"capture-website": "^0.6.0",
+		"capture-website": "^0.7.0",
 		"get-stdin": "^7.0.0",
 		"meow": "^5.0.0",
 		"split-on-first": "^1.0.0"
@@ -48,8 +48,8 @@
 	"devDependencies": {
 		"ava": "^2.0.0",
 		"create-test-server": "^3.0.1",
-		"execa": "^1.0.0",
-		"file-type": "^11.1.0",
-		"xo": "^0.24.0"
+		"execa": "^3.2.0",
+		"file-type": "^12.3.1",
+		"xo": "^0.25.3"
 	}
 }
