@@ -89,6 +89,11 @@ $ capture-website --help
 ```
 
 
+## FAQ
+
+[Click here.](https://github.com/sindresorhus/capture-website#faq)
+
+
 ## Related
 
 - [capture-website](https://github.com/sindresorhus/capture-website) - API for this module
