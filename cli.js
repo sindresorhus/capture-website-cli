@@ -40,6 +40,7 @@ const cli = meow(`
 	  --cookie                 Set a cookie (Can be set multiple times)
 	  --authentication         Credentials for HTTP authentication
 	  --debug                  Show the browser window to see what it's doing
+	  --dark-mode              Emulate preference of dark color scheme
 	  --launch-options         Puppeteer launch options as JSON
 	  --overwrite              Overwrite the destination file if it exists
 
@@ -75,6 +76,7 @@ const cli = meow(`
 	  --cookie="id=unicorn; Expires=Wed, 21 Oct 2018 07:28:00 GMT;"
 	  --authentication="username:password"
 	  --launch-options='{"headless": false}'
+	  --dark-mode
 `, {
 	flags: {
 		output: {
@@ -160,6 +162,9 @@ const cli = meow(`
 			type: 'string'
 		},
 		debug: {
+			type: 'boolean'
+		},
+		darkMode: {
 			type: 'boolean'
 		},
 		launchOptions: {
