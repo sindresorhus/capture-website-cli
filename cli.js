@@ -122,10 +122,12 @@ const cli = meow(`
 			type: 'string'
 		},
 		hideElements: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		removeElements: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		clickElement: {
 			type: 'string'
@@ -141,13 +143,16 @@ const cli = meow(`
 			default: true
 		},
 		module: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		script: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		style: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		header: {
 			type: 'string'
@@ -156,7 +161,8 @@ const cli = meow(`
 			type: 'string'
 		},
 		cookie: {
-			type: 'string'
+			type: 'string',
+			isMultiple: true
 		},
 		authentication: {
 			type: 'string'
@@ -179,11 +185,11 @@ const cli = meow(`
 let [input] = cli.input;
 const options = cli.flags;
 
-options.hideElements = arrify(options.hideElements);
-options.removeElements = arrify(options.removeElements);
-options.modules = arrify(options.module);
-options.scripts = arrify(options.script);
-options.styles = arrify(options.style);
+// TODO: `meow` needs a way to handle this.
+options.modules = options.module;
+options.scripts = options.script;
+options.styles = options.style;
+options.cookies = options.cookie;
 
 if (options.launchOptions) {
 	options.launchOptions = JSON.parse(options.launchOptions);
@@ -194,8 +200,6 @@ for (const header of arrify(options.header)) {
 	const [key, value] = header.split(':');
 	options.headers[key.trim()] = value.trim();
 }
-
-options.cookies = arrify(options.cookie);
 
 if (options.authentication) {
 	const [username, password] = splitOnFirst(options.authentication, ':');

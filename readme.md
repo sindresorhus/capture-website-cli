@@ -4,7 +4,6 @@
 
 It uses [Puppeteer](https://github.com/GoogleChrome/puppeteer) (Chrome) under the hood.
 
-
 ## Install
 
 ```
@@ -12,7 +11,6 @@ $ npm install --global capture-website-cli
 ```
 
 Note to Linux users: If you get a "No usable sandbox!" error, you need to enable [system sandboxing](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#setting-up-chrome-linux-sandbox).
-
 
 ## Usage
 
@@ -90,11 +88,9 @@ $ capture-website --help
     --dark-mode
 ```
 
-
 ## FAQ
 
 [Click here.](https://github.com/sindresorhus/capture-website#faq)
-
 
 ## Related
 

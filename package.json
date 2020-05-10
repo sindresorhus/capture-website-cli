@@ -4,16 +4,17 @@
 	"description": "Capture screenshots of websites from the command-line",
 	"license": "MIT",
 	"repository": "sindresorhus/capture-website-cli",
+	"funding": "https://github.com/sponsors/sindresorhus",
 	"author": {
 		"name": "Sindre Sorhus",
 		"email": "sindresorhus@gmail.com",
-		"url": "sindresorhus.com"
+		"url": "https://sindresorhus.com"
 	},
 	"bin": {
 		"capture-website": "cli.js"
 	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=10"
 	},
 	"scripts": {
 		"test": "xo && ava"
@@ -40,16 +41,16 @@
 	],
 	"dependencies": {
 		"arrify": "^2.0.1",
-		"capture-website": "^0.8.0",
+		"capture-website": "^1.0.0",
 		"get-stdin": "^7.0.0",
-		"meow": "^5.0.0",
+		"meow": "^7.0.1",
 		"split-on-first": "^2.0.0"
 	},
 	"devDependencies": {
 		"ava": "^2.0.0",
 		"create-test-server": "^3.0.1",
-		"execa": "^3.3.0",
+		"execa": "^4.0.1",
 		"file-type": "^12.4.0",
-		"xo": "^0.25.3"
+		"xo": "^0.30.0"
 	}
 }
