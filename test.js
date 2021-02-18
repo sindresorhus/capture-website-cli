@@ -54,6 +54,7 @@ test('check flags', async t => {
 --authentication="username:password"
 --launch-options="{\\"headless\\": false}"
 --dark-mode
+--inset=10,-15,-15,25
 	`;
 
 	flags = flags.trim()

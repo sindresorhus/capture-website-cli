@@ -53,6 +53,7 @@ $ capture-website --help
     --dark-mode              Emulate preference of dark color scheme
     --launch-options         Puppeteer launch options as JSON
     --overwrite              Overwrite the destination file if it exists
+    --inset                  Set the inset of the screenshot relative to the viewport or \`--element\`. Accepts \`number\` or four comma-separated numbers for top, right, left and bottom values
 
   Examples
     $ capture-website https://sindresorhus.com --output=screenshot.png
@@ -86,6 +87,7 @@ $ capture-website --help
     --authentication="username:password"
     --launch-options='{"headless": false}'
     --dark-mode
+    --inset=10,15,-10,15
 ```
 
 ## FAQ
