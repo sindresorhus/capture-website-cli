@@ -214,7 +214,7 @@ if (options.authentication) {
 
 if (options.inset) {
 	const values = options.inset.split(',').map(chunk => Number.parseInt(chunk, 10));
-	const containsNaN = values.findIndex(number => Number.isNaN(number)) > -1;
+	const containsNaN = values.some(number => Number.isNaN(number));
 
 	if (containsNaN || ![1, 4].includes(values.length)) {
 		console.error('Invalid `--inset` value');
