@@ -88,6 +88,7 @@ $ capture-website --help
     --launch-options='{"headless": false}'
     --dark-mode
     --inset=10,15,-10,15
+    --inset=30
 ```
 
 ## FAQ

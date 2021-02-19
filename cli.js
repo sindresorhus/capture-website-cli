@@ -79,6 +79,7 @@ const cli = meow(`
 	  --launch-options='{"headless": false}'
 	  --dark-mode
 	  --inset=10,15,-10,15
+	  --inset=30
 `, {
 	flags: {
 		output: {
