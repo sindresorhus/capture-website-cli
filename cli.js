@@ -224,10 +224,13 @@ if (options.inset) {
 	if (values.length === 1) {
 		options.inset = values[0];
 	} else {
-		options.inset = ['top', 'right', 'bottom', 'left'].reduce((acc, key, index) => {
-			acc[key] = values[index];
-			return acc;
-		}, {});
+		const insetOption = {};
+
+		for (const [index, key] of ['top', 'right', 'bottom', 'left'].entries()) {
+			insetOption[key] = values[index];
+		}
+
+		options.inset = insetOption;
 	}
 }
 
