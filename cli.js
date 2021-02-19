@@ -216,7 +216,7 @@ if (options.inset) {
 	const containsNaN = values.findIndex(number => Number.isNaN(number)) > -1;
 
 	if (containsNaN || ![1, 4].includes(values.length)) {
-		console.error('The `inset` flag value is invalid, please refer to the flag examples');
+		console.error('Invalid `--inset` value');
 		process.exit(1);
 	}
 
