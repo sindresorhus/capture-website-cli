@@ -43,6 +43,7 @@ const cli = meow(`
 	  --dark-mode              Emulate preference of dark color scheme
 	  --launch-options         Puppeteer launch options as JSON
 	  --overwrite              Overwrite the destination file if it exists
+	  --inset                  Inset the screenshot relative to the viewport or \`--element\`. Accepts a number or four comma-separated numbers for top, right, left, and bottom.
 
 	Examples
 	  $ capture-website https://sindresorhus.com --output=screenshot.png
@@ -77,6 +78,8 @@ const cli = meow(`
 	  --authentication="username:password"
 	  --launch-options='{"headless": false}'
 	  --dark-mode
+	  --inset=10,15,-10,15
+	  --inset=30
 `, {
 	flags: {
 		output: {
@@ -178,6 +181,9 @@ const cli = meow(`
 		},
 		overwrite: {
 			type: 'boolean'
+		},
+		inset: {
+			type: 'string'
 		}
 	}
 });
@@ -204,6 +210,28 @@ for (const header of arrify(options.header)) {
 if (options.authentication) {
 	const [username, password] = splitOnFirst(options.authentication, ':');
 	options.authentication = {username, password};
+}
+
+if (options.inset) {
+	const values = options.inset.split(',').map(chunk => Number.parseInt(chunk, 10));
+	const containsNaN = values.some(number => Number.isNaN(number));
+
+	if (containsNaN || ![1, 4].includes(values.length)) {
+		console.error('Invalid `--inset` value');
+		process.exit(1);
+	}
+
+	if (values.length === 1) {
+		options.inset = values[0];
+	} else {
+		const insetOption = {};
+
+		for (const [index, key] of ['top', 'right', 'bottom', 'left'].entries()) {
+			insetOption[key] = values[index];
+		}
+
+		options.inset = insetOption;
+	}
 }
 
 options.isJavaScriptEnabled = options.javascript;
