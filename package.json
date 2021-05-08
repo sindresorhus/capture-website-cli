@@ -1,6 +1,6 @@
 {
 	"name": "capture-website-cli",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"description": "Capture screenshots of websites from the command-line",
 	"license": "MIT",
 	"repository": "sindresorhus/capture-website-cli",
