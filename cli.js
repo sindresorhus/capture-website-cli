@@ -1,10 +1,9 @@
 #!/usr/bin/env node
-'use strict';
-const meow = require('meow');
-const captureWebsite = require('capture-website');
-const arrify = require('arrify');
-const splitOnFirst = require('split-on-first');
-const getStdin = require('get-stdin');
+import meow from 'meow';
+import captureWebsite from 'capture-website';
+import arrify from 'arrify';
+import splitOnFirst from 'split-on-first';
+import getStdin from 'get-stdin';
 
 const cli = meow(`
 	Usage
@@ -81,6 +80,7 @@ const cli = meow(`
 	  --inset=10,15,-10,15
 	  --inset=30
 `, {
+	importMeta: import.meta,
 	flags: {
 		output: {
 			type: 'string'
@@ -196,6 +196,10 @@ options.modules = options.module;
 options.scripts = options.script;
 options.styles = options.style;
 options.cookies = options.cookie;
+delete options.module;
+delete options.script;
+delete options.style;
+delete options.cookie;
 
 if (options.launchOptions) {
 	options.launchOptions = JSON.parse(options.launchOptions);

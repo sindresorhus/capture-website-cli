@@ -10,11 +10,12 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "https://sindresorhus.com"
 	},
+	"type": "module",
 	"bin": {
-		"capture-website": "cli.js"
+		"capture-website": "./cli.js"
 	},
 	"engines": {
-		"node": ">=10"
+		"node": ">=12.20"
 	},
 	"scripts": {
 		"test": "xo && ava"
@@ -40,17 +41,17 @@
 		"jpg"
 	],
 	"dependencies": {
-		"arrify": "^2.0.1",
-		"capture-website": "^1.4.0",
-		"get-stdin": "^8.0.0",
-		"meow": "^7.0.1",
-		"split-on-first": "^2.0.1"
+		"arrify": "^3.0.0",
+		"capture-website": "^2.0.0",
+		"get-stdin": "^9.0.0",
+		"meow": "^10.0.0",
+		"split-on-first": "^3.0.0"
 	},
 	"devDependencies": {
-		"ava": "^2.4.0",
+		"ava": "^3.15.0",
 		"create-test-server": "^3.0.1",
 		"execa": "^5.0.0",
 		"file-type": "^12.4.0",
-		"xo": "^0.38.1"
+		"xo": "^0.39.1"
 	}
 }
