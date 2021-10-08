@@ -25,8 +25,8 @@ $ capture-website --help
     --output                 Image file path (writes it to stdout if omitted)
     --width                  Page width  [default: 1280]
     --height                 Page height  [default: 800]
-    --type                   Image type: png|jpeg  [default: png]
-    --quality                Image quality: 0...1 (Only for JPEG)  [default: 1]
+    --type                   Image type: png|jpeg|webp  [default: png]
+    --quality                Image quality: 0...1 (Only for JPEG and WebP)  [default: 1]
     --scale-factor           Scale the webpage `n` times  [default: 2]
     --list-devices           Output a list of supported devices to emulate
     --emulate-device         Capture as if it were captured on the given device

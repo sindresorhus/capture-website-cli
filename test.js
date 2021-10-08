@@ -1,7 +1,7 @@
 import test from 'ava';
 import execa from 'execa';
 import createTestServer from 'create-test-server';
-import fileType from 'file-type';
+import FileType from 'file-type';
 
 test('main', async t => {
 	const server = await createTestServer();
@@ -12,7 +12,7 @@ test('main', async t => {
 
 	const {stdout} = await execa('./cli.js', [server.url], {encoding: 'buffer'});
 
-	t.is(fileType(stdout).mime, 'image/png');
+	t.is((await FileType.fromBuffer(stdout)).mime, 'image/png');
 
 	await server.close();
 });
@@ -20,9 +20,9 @@ test('main', async t => {
 test('support HTML input', async t => {
 	const {stdout} = await execa('./cli.js', [], {
 		input: '<h1>Unicorn</h1>',
-		encoding: 'buffer'
+		encoding: 'buffer',
 	});
-	t.is(fileType(stdout).mime, 'image/png');
+	t.is((await FileType.fromBuffer(stdout)).mime, 'image/png');
 });
 
 test('check flags', async t => {

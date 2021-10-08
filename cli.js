@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import process from 'node:process';
 import meow from 'meow';
 import captureWebsite from 'capture-website';
 import arrify from 'arrify';
@@ -14,8 +15,8 @@ const cli = meow(`
 	  --output                 Image file path (writes it to stdout if omitted)
 	  --width                  Page width  [default: 1280]
 	  --height                 Page height  [default: 800]
-	  --type                   Image type: png|jpeg  [default: png]
-	  --quality                Image quality: 0...1 (Only for JPEG)  [default: 1]
+	  --type                   Image type: png|jpeg|webp  [default: png]
+	  --quality                Image quality: 0...1 (Only for JPEG and WebP)  [default: 1]
 	  --scale-factor           Scale the webpage \`n\` times  [default: 2]
 	  --list-devices           Output a list of supported devices to emulate
 	  --emulate-device         Capture as if it were captured on the given device
@@ -83,109 +84,109 @@ const cli = meow(`
 	importMeta: import.meta,
 	flags: {
 		output: {
-			type: 'string'
+			type: 'string',
 		},
 		width: {
-			type: 'number'
+			type: 'number',
 		},
 		height: {
-			type: 'number'
+			type: 'number',
 		},
 		type: {
-			type: 'string'
+			type: 'string',
 		},
 		quality: {
-			type: 'number'
+			type: 'number',
 		},
 		scaleFactor: {
-			type: 'number'
+			type: 'number',
 		},
 		listDevices: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		emulateDevice: {
-			type: 'string'
+			type: 'string',
 		},
 		fullPage: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		defaultBackground: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		timeout: {
-			type: 'number'
+			type: 'number',
 		},
 		delay: {
-			type: 'number'
+			type: 'number',
 		},
 		waitForElement: {
-			type: 'string'
+			type: 'string',
 		},
 		element: {
-			type: 'string'
+			type: 'string',
 		},
 		hideElements: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		removeElements: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		clickElement: {
-			type: 'string'
+			type: 'string',
 		},
 		scrollToElement: {
-			type: 'string'
+			type: 'string',
 		},
 		disableAnimations: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		javascript: {
 			type: 'boolean',
-			default: true
+			default: true,
 		},
 		module: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		script: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		style: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		header: {
-			type: 'string'
+			type: 'string',
 		},
 		userAgent: {
-			type: 'string'
+			type: 'string',
 		},
 		cookie: {
 			type: 'string',
-			isMultiple: true
+			isMultiple: true,
 		},
 		authentication: {
-			type: 'string'
+			type: 'string',
 		},
 		debug: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		darkMode: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		launchOptions: {
-			type: 'string'
+			type: 'string',
 		},
 		overwrite: {
-			type: 'boolean'
+			type: 'boolean',
 		},
 		inset: {
-			type: 'string'
-		}
-	}
+			type: 'string',
+		},
+	},
 });
 
 let [input] = cli.input;
@@ -244,7 +245,7 @@ options.isJavaScriptEnabled = options.javascript;
 	const {
 		internalPrintFlags,
 		listDevices,
-		output
+		output,
 	} = options;
 
 	if (internalPrintFlags) {
