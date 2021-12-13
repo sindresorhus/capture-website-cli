@@ -93,7 +93,26 @@ $ capture-website --help
 
 ## FAQ
 
-[Click here.](https://github.com/sindresorhus/capture-website#faq)
+[More here.](https://github.com/sindresorhus/capture-website#faq)
+
+### How can I capture websites from a file with URLs?
+
+Lets say you have a file named `urls.txt` with:
+
+```
+https://sindresorhus.com
+https://github.com
+```
+
+You can run this:
+
+```sh
+filename='urls.txt'
+
+while read url; do
+  capture-website "$url" --output "screenshot-$(echo "$url" | sed -e 's/[^A-Za-z0-9._-]//g').png"
+done < "$filename"
+```
 
 ## Related
 
