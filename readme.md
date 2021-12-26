@@ -111,6 +111,9 @@ You can run this:
 ```sh
 filename='urls.txt'
 
+< "$filename" xargs -I{} capture-website "{}"
+
+# Or, for custom output file naming
 while read url; do
   capture-website "$url" --output "screenshot-$(echo "$url" | sed -e 's/[^A-Za-z0-9._-]//g').png"
 done < "$filename"
