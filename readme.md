@@ -22,7 +22,7 @@ $ capture-website --help
     $ echo "<h1>Unicorn</h1>" | capture-website
 
   Options
-    --output                 Image file path (writes it to stdout if omitted)
+    --output                 Image file path (names file based on URL if omitted)
     --width                  Page width  [default: 1280]
     --height                 Page height  [default: 800]
     --type                   Image type: png|jpeg|webp  [default: png]
@@ -56,8 +56,10 @@ $ capture-website --help
     --inset                  Inset the screenshot relative to the viewport or \`--element\`. Accepts a number or four comma-separated numbers for top, right, left, and bottom.
 
   Examples
+    $ capture-website https://sindresorhus.com
     $ capture-website https://sindresorhus.com --output=screenshot.png
     $ capture-website index.html --output=screenshot.png
+    $ capture-website file:///tmp/index.html --full-page --output=-
     $ echo "<h1>Unicorn</h1>" | capture-website --output=screenshot.png
     $ capture-website https://sindresorhus.com | open -f -a Preview
 
