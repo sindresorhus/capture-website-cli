@@ -45,7 +45,8 @@
 		"capture-website": "^2.1.0",
 		"get-stdin": "^9.0.0",
 		"meow": "^10.1.1",
-		"split-on-first": "^3.0.0"
+		"split-on-first": "^3.0.0",
+		"filenamify": "^5.0.1"
 	},
 	"devDependencies": {
 		"ava": "^3.15.0",
