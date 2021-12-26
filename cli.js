@@ -5,6 +5,10 @@ import captureWebsite from 'capture-website';
 import arrify from 'arrify';
 import splitOnFirst from 'split-on-first';
 import getStdin from 'get-stdin';
+import filenamify from 'filenamify';
+import { URL } from 'url';
+import { fstat, accessSync, constants } from 'fs';
+import { basename, extname } from 'path';
 
 const cli = meow(`
 	Usage
@@ -94,6 +98,7 @@ const cli = meow(`
 		},
 		type: {
 			type: 'string',
+			default: 'png',
 		},
 		quality: {
 			type: 'number',
@@ -246,6 +251,8 @@ options.isJavaScriptEnabled = options.javascript;
 		internalPrintFlags,
 		listDevices,
 		output,
+		type,
+		overwrite,
 	} = options;
 
 	if (internalPrintFlags) {
@@ -268,9 +275,71 @@ options.isJavaScriptEnabled = options.javascript;
 		process.exit(1);
 	}
 
-	if (output) {
-		await captureWebsite.file(input, output, options);
-	} else {
-		process.stdout.write(await captureWebsite.buffer(input, options));
-	}
+	// Performing stat over stdout (file descriptor 1)
+  await fstat(1, async function(e, stat) {
+		if (e) {
+      console.error('Error: ' + e.message);
+      process.exit(1);
+    }
+
+		// Check if output is piped
+		if (!output && stat.isFIFO() || output == '-') {
+			try {
+				process.stdout.write(await captureWebsite.buffer(input, options));
+			} catch (e) {
+				console.error('Error: ' + e.message);
+				process.exit(1);
+			}
+		} else {
+			let filename = output;
+
+			if (!filename) {
+				if (options.inputType == 'html') {
+					filename = 'stdin';
+				} else {
+					let url;
+
+					try {
+						// Check if input is a URL
+						url = new URL(input);
+					} catch(e) {}
+
+					if (url) {
+						// Input is a URL
+						filename = filenamify(url.hostname + url.pathname, { replacement: '-' });
+					} else {
+						// Input is a file path
+						try {
+							// Check if input file exists
+							accessSync(input, constants.F_OK);
+						} catch (e) {
+							console.error('Error: ' + e.message);
+							process.exit(1);
+						}
+
+						filename = basename(input, extname(input));
+					}
+				}
+
+				filename += '.' + type;
+			}
+
+			try {
+				// Check if output file already exists
+				accessSync(filename, constants.F_OK);
+
+				if (!overwrite) {
+					console.error("'" + filename + "' already exists, use --overwrite to bypass this error");
+					process.exit(1);
+				}
+			} catch (e) {}
+
+			try {
+				await captureWebsite.file(input, filename, options);
+			} catch (e) {
+				console.error('Error: ' + e.message);
+				process.exit(1);
+			}
+		}
+	});
 })();
