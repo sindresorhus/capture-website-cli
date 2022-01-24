@@ -125,7 +125,7 @@ const cli = meow(`
 			type: 'string',
 		},
 		clip: {
-			type: 'string'
+			type: 'string',
 		},
 		element: {
 			type: 'string',
@@ -213,7 +213,7 @@ if (options.launchOptions) {
 
 if (options.clip) {
 	const [x, y, width, height] = options.clip.split(',').map(chunk => Number.parseInt(chunk, 10));
-	options.clip = { x, y, width, height };
+	options.clip = {x, y, width, height};
 }
 
 options.headers = {};
