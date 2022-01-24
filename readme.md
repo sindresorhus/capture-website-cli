@@ -54,6 +54,7 @@ $ capture-website --help
     --launch-options         Puppeteer launch options as JSON
     --overwrite              Overwrite the destination file if it exists
     --inset                  Inset the screenshot relative to the viewport or \`--element\`. Accepts a number or four comma-separated numbers for top, right, left, and bottom.
+    --clip                   Define the screenshot's position and size (clipping region).  Accepts a number or four comma-separated numbers for x, y, width and height.
 
   Examples
     $ capture-website https://sindresorhus.com --output=screenshot.png
@@ -89,6 +90,7 @@ $ capture-website --help
     --dark-mode
     --inset=10,15,-10,15
     --inset=30
+    --clip=10,30,300,1024
 ```
 
 ## FAQ
