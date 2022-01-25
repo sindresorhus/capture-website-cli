@@ -44,6 +44,7 @@ const cli = meow(`
 	  --launch-options         Puppeteer launch options as JSON
 	  --overwrite              Overwrite the destination file if it exists
 	  --inset                  Inset the screenshot relative to the viewport or \`--element\`. Accepts a number or four comma-separated numbers for top, right, left, and bottom.
+	  --clip                   Position and size in the website (clipping region). Accepts comma-separated numbers for x, y, width, and height.
 
 	Examples
 	  $ capture-website https://sindresorhus.com --output=screenshot.png
@@ -80,6 +81,7 @@ const cli = meow(`
 	  --dark-mode
 	  --inset=10,15,-10,15
 	  --inset=30
+	  --clip=10,30,300,1024
 `, {
 	importMeta: import.meta,
 	flags: {
@@ -120,6 +122,9 @@ const cli = meow(`
 			type: 'number',
 		},
 		waitForElement: {
+			type: 'string',
+		},
+		clip: {
 			type: 'string',
 		},
 		element: {
@@ -204,6 +209,11 @@ delete options.cookie;
 
 if (options.launchOptions) {
 	options.launchOptions = JSON.parse(options.launchOptions);
+}
+
+if (options.clip) {
+	const [x, y, width, height] = options.clip.split(',').map(chunk => Number.parseInt(chunk, 10));
+	options.clip = {x, y, width, height};
 }
 
 options.headers = {};

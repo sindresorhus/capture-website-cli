@@ -55,6 +55,7 @@ test('check flags', async t => {
 --launch-options="{\\"headless\\": false}"
 --dark-mode
 --inset=10,-15,-15,25
+--clip=10,30,300,1024
 	`;
 
 	flags = flags.trim()
