@@ -44,15 +44,15 @@
 		"arrify": "^3.0.0",
 		"capture-website": "^2.2.0",
 		"get-stdin": "^9.0.0",
-		"meow": "^10.1.1",
+		"meow": "^10.1.2",
 		"split-on-first": "^3.0.0"
 	},
 	"devDependencies": {
-		"ava": "^3.15.0",
+		"ava": "^4.0.1",
 		"create-test-server": "^3.0.1",
-		"execa": "^5.1.1",
-		"file-type": "^16.5.3",
-		"typescript": "^4.4.3",
-		"xo": "^0.45.0"
+		"execa": "^6.0.0",
+		"file-type": "^17.1.1",
+		"typescript": "^4.5.5",
+		"xo": "^0.47.0"
 	}
 }

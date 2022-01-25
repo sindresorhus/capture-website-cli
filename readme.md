@@ -6,8 +6,8 @@ It uses [Puppeteer](https://github.com/GoogleChrome/puppeteer) (Chrome) under th
 
 ## Install
 
-```
-$ npm install --global capture-website-cli
+```sh
+npm install --global capture-website-cli
 ```
 
 Note to Linux users: If you get a "No usable sandbox!" error, you need to enable [system sandboxing](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#setting-up-chrome-linux-sandbox).
