@@ -92,6 +92,7 @@ $ capture-website --help
     --inset=10,15,-10,15
     --inset=30
     --clip=10,30,300,1024
+    --no-block-ads
 ```
 
 ## FAQ

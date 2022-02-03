@@ -58,7 +58,7 @@ test('check flags', async t => {
 --dark-mode
 --inset=10,-15,-15,25
 --clip=10,30,300,1024
---no-block-ads=false
+--no-block-ads
 	`;
 
 	flags = flags.trim()

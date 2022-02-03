@@ -192,8 +192,9 @@ const cli = meow(`
 		inset: {
 			type: 'string',
 		},
-		noBlockAds: {
+		blockAds: {
 			type: 'boolean',
+			default: true,
 		},
 	},
 });
@@ -206,12 +207,10 @@ options.modules = options.module;
 options.scripts = options.script;
 options.styles = options.style;
 options.cookies = options.cookie;
-options.blockAds = !options.noBlockAds;
 delete options.module;
 delete options.script;
 delete options.style;
 delete options.cookie;
-delete options.noBlockAds;
 
 if (options.launchOptions) {
 	options.launchOptions = JSON.parse(options.launchOptions);
