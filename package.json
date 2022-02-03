@@ -42,7 +42,7 @@
 	],
 	"dependencies": {
 		"arrify": "^3.0.0",
-		"capture-website": "^2.2.0",
+		"capture-website": "^2.3.0",
 		"get-stdin": "^9.0.0",
 		"meow": "^10.1.2",
 		"split-on-first": "^3.0.0"

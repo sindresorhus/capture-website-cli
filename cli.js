@@ -45,6 +45,7 @@ const cli = meow(`
 	  --overwrite              Overwrite the destination file if it exists
 	  --inset                  Inset the screenshot relative to the viewport or \`--element\`. Accepts a number or four comma-separated numbers for top, right, left, and bottom.
 	  --clip                   Position and size in the website (clipping region). Accepts comma-separated numbers for x, y, width, and height.
+	  --no-block-ads           Disable Ad Blocker  [default: false]
 
 	Examples
 	  $ capture-website https://sindresorhus.com --output=screenshot.png
@@ -191,6 +192,9 @@ const cli = meow(`
 		inset: {
 			type: 'string',
 		},
+		noBlockAds: {
+			type: 'boolean',
+		},
 	},
 });
 
@@ -202,10 +206,12 @@ options.modules = options.module;
 options.scripts = options.script;
 options.styles = options.style;
 options.cookies = options.cookie;
+options.blockAds = !options.noBlockAds;
 delete options.module;
 delete options.script;
 delete options.style;
 delete options.cookie;
+delete options.noBlockAds;
 
 if (options.launchOptions) {
 	options.launchOptions = JSON.parse(options.launchOptions);
