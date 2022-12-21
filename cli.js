@@ -285,7 +285,7 @@ options.isJavaScriptEnabled = options.javascript;
 	}
 
 	if (output == 'base64') {
-		await captureWebsite.base64(input, options);
+		process.stdout.write(await captureWebsite.base64(input, options));
 	} else if (output) {
 		await captureWebsite.file(input, output, options);
 	} else {
