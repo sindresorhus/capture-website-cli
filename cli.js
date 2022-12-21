@@ -49,6 +49,7 @@ const cli = meow(`
 
 	Examples
 	  $ capture-website https://sindresorhus.com --output=screenshot.png
+	  $ capture-website https://sindresorhus.com --output=base64
 	  $ capture-website index.html --output=screenshot.png
 	  $ echo "<h1>Unicorn</h1>" | capture-website --output=screenshot.png
 	  $ capture-website https://sindresorhus.com | open -f -a Preview
@@ -283,7 +284,9 @@ options.isJavaScriptEnabled = options.javascript;
 		process.exit(1);
 	}
 
-	if (output) {
+	if (output == 'base64') {
+		await captureWebsite.base64(input, options);
+	} else if (output) {
 		await captureWebsite.file(input, output, options);
 	} else {
 		process.stdout.write(await captureWebsite.buffer(input, options));

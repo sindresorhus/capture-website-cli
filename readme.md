@@ -22,7 +22,7 @@ $ capture-website --help
     $ echo "<h1>Unicorn</h1>" | capture-website
 
   Options
-    --output                 Image file path (writes it to stdout if omitted)
+    --output                 Image file path (writes it to stdout if omitted) or base64 encoded image
     --width                  Page width  [default: 1280]
     --height                 Page height  [default: 800]
     --type                   Image type: png|jpeg|webp  [default: png]
