@@ -2,7 +2,6 @@
 import process from 'node:process';
 import meow from 'meow';
 import captureWebsite from 'capture-website';
-import arrify from 'arrify';
 import splitOnFirst from 'split-on-first';
 import getStdin from 'get-stdin';
 
@@ -166,6 +165,7 @@ const cli = meow(`
 		},
 		header: {
 			type: 'string',
+			isMultiple: true,
 		},
 		userAgent: {
 			type: 'string',
@@ -222,10 +222,12 @@ if (options.clip) {
 }
 
 options.headers = {};
-for (const header of arrify(options.header)) {
+for (const header of options.header) {
 	const [key, value] = header.split(':');
 	options.headers[key.trim()] = value.trim();
 }
+
+delete options.header;
 
 if (options.authentication) {
 	const [username, password] = splitOnFirst(options.authentication, ':');
@@ -256,7 +258,7 @@ if (options.inset) {
 
 options.isJavaScriptEnabled = options.javascript;
 
-(async () => {
+async function main() {
 	const {
 		internalPrintFlags,
 		listDevices,
@@ -288,4 +290,6 @@ options.isJavaScriptEnabled = options.javascript;
 	} else {
 		process.stdout.write(await captureWebsite.buffer(input, options));
 	}
-})();
+}
+
+await main();
