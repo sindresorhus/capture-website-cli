@@ -166,6 +166,7 @@ const cli = meow(`
 		},
 		header: {
 			type: 'string',
+			isMultiple: true,
 		},
 		userAgent: {
 			type: 'string',
