@@ -63,7 +63,7 @@ test('check flags', async t => {
 
 	flags = flags.trim()
 		.replaceAll(/(?<==)"|(?<!\\)"$/gm, '')
-		.replaceAll('\\"', '"')
+		.replaceAll(String.raw`\"`, '"')
 		.split('\n');
 
 	const {stdout} = await execa('./cli.js', ['noop-file', '--internal-print-flags', ...flags]);

@@ -212,13 +212,13 @@ delete options.script;
 delete options.style;
 delete options.cookie;
 
-if (options.launchOptions) {
-	options.launchOptions = JSON.parse(options.launchOptions);
-}
+options.launchOptions &&= JSON.parse(options.launchOptions);
 
 if (options.clip) {
 	const [x, y, width, height] = options.clip.split(',').map(chunk => Number.parseInt(chunk, 10));
-	options.clip = {x, y, width, height};
+	options.clip = {
+		x, y, width, height,
+	};
 }
 
 options.headers = {};

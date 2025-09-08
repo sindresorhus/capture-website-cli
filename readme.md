@@ -14,7 +14,7 @@ Note to Linux users: If you get a "No usable sandbox!" error, you need to enable
 
 ## Usage
 
-```
+```console
 $ capture-website --help
 
   Usage
@@ -120,5 +120,5 @@ done < "$filename"
 
 ## Related
 
-- [capture-website](https://github.com/sindresorhus/capture-website) - API for this module
+- [capture-website](https://github.com/sindresorhus/capture-website) - API for this package
 - [pageres-cli](https://github.com/sindresorhus/pageres-cli) - A different take on screenshotting websites
