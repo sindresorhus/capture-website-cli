@@ -45,6 +45,8 @@ const cli = meow(`
 	  --inset                  Inset the screenshot relative to the viewport or \`--element\`. Accepts a number or four comma-separated numbers for top, right, left, and bottom.
 	  --clip                   Position and size in the website (clipping region). Accepts comma-separated numbers for x, y, width, and height.
 	  --no-block-ads           Disable ad blocking
+	  --allow-cors             Allow cross-origin requests (useful for local HTML files)
+	  --wait-for-network-idle  Wait for network connections to finish
 
 	Examples
 	  $ capture-website https://sindresorhus.com --output=screenshot.png
@@ -82,6 +84,8 @@ const cli = meow(`
 	  --inset=10,15,-10,15
 	  --inset=30
 	  --clip=10,30,300,1024
+	  --allow-cors
+	  --wait-for-network-idle
 `, {
 	importMeta: import.meta,
 	flags: {
@@ -195,6 +199,12 @@ const cli = meow(`
 		blockAds: {
 			type: 'boolean',
 			default: true,
+		},
+		allowCors: {
+			type: 'boolean',
+		},
+		waitForNetworkIdle: {
+			type: 'boolean',
 		},
 	},
 });
