@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import process from 'node:process';
+import {mkdir} from 'node:fs/promises';
+import path from 'node:path';
 import meow from 'meow';
 import captureWebsite from 'capture-website';
 import splitOnFirst from 'split-on-first';
@@ -296,6 +298,10 @@ async function main() {
 	}
 
 	if (output) {
+		// Ensure the directory exists when using --overwrite
+		const outputDirectory = path.dirname(output);
+		await mkdir(outputDirectory, {recursive: true});
+
 		await captureWebsite.file(input, output, options);
 	} else {
 		process.stdout.write(await captureWebsite.buffer(input, options));
