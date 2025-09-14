@@ -12,6 +12,8 @@ npm install --global capture-website-cli
 
 Note to Linux users: If you get a "No usable sandbox!" error, you need to enable [system sandboxing](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#setting-up-chrome-linux-sandbox).
 
+Note to Apple silicon users: If you get a "spawn Unknown system error" error, try installing Rosetta by running `softwareupdate --install-rosetta`.
+
 ## Usage
 
 ```console
