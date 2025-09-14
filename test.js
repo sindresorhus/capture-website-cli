@@ -54,6 +54,128 @@ test('error handling for timeout', async t => {
 	t.is(error.exitCode, 1);
 });
 
+test('localStorage flag sets localStorage before page load', async t => {
+	const server = await createTestServer();
+
+	server.get('/', (request, response) => {
+		response.end(`
+			<!DOCTYPE html>
+			<html>
+			<body>
+				<div id="result">
+					<script>
+						const value = localStorage.getItem('testKey');
+						document.write(value === 'testValue' ? 'SUCCESS' : 'FAIL');
+					</script>
+				</div>
+			</body>
+			</html>
+		`);
+	});
+
+	const {stdout} = await execa('./cli.js', [
+		server.url,
+		'--local-storage=testKey=testValue',
+	], {encoding: 'buffer'});
+
+	const {mime} = await fileTypeFromBuffer(stdout);
+	t.is(mime, 'image/png');
+
+	await server.close();
+});
+
+test('localStorage flag handles multiple key-value pairs', async t => {
+	const server = await createTestServer();
+
+	server.get('/', (request, response) => {
+		response.end(`
+			<!DOCTYPE html>
+			<html>
+			<body>
+				<div id="result">
+					<script>
+						const key1 = localStorage.getItem('key1');
+						const key2 = localStorage.getItem('key2');
+						document.write((key1 === 'value1' && key2 === 'value2') ? 'SUCCESS' : 'FAIL');
+					</script>
+				</div>
+			</body>
+			</html>
+		`);
+	});
+
+	const {stdout} = await execa('./cli.js', [
+		server.url,
+		'--local-storage=key1=value1',
+		'--local-storage=key2=value2',
+	], {encoding: 'buffer'});
+
+	const {mime} = await fileTypeFromBuffer(stdout);
+	t.is(mime, 'image/png');
+
+	await server.close();
+});
+
+test('localStorage flag validates format', async t => {
+	const error = await t.throwsAsync(execa('./cli.js', [
+		'https://example.com',
+		'--output=test-invalid-localStorage.png',
+		'--local-storage=invalid-format',
+	]));
+
+	t.true(error.stderr.includes('Invalid localStorage format'));
+	t.is(error.exitCode, 1);
+});
+
+test('localStorage flag handles edge cases', async t => {
+	const server = await createTestServer();
+
+	server.get('/', (request, response) => {
+		response.end(`
+			<!DOCTYPE html>
+			<html>
+			<body>
+				<div id="result">
+					<script>
+						const emptyValue = localStorage.getItem('emptyKey');
+						const equalsValue = localStorage.getItem('equalsKey');
+						const trimmedKey = localStorage.getItem('trimmedKey');
+						document.write([
+							emptyValue === '',
+							equalsValue === 'value=with=equals',
+							trimmedKey === 'trimmed value'
+						].every(Boolean) ? 'SUCCESS' : 'FAIL');
+					</script>
+				</div>
+			</body>
+			</html>
+		`);
+	});
+
+	const {stdout} = await execa('./cli.js', [
+		server.url,
+		'--local-storage=emptyKey=',
+		'--local-storage=equalsKey=value=with=equals',
+		'--local-storage= trimmedKey = trimmed value ',
+	], {encoding: 'buffer'});
+
+	const {mime} = await fileTypeFromBuffer(stdout);
+	t.is(mime, 'image/png');
+
+	await server.close();
+});
+
+test('localStorage flag validates empty key', async t => {
+	const error = await t.throwsAsync(execa('./cli.js', [
+		'https://example.com',
+		'--output=test-empty-key.png',
+		'--local-storage==value',
+	]));
+
+	t.true(error.stderr.includes('Invalid localStorage format'));
+	t.is(error.exitCode, 1);
+});
+
 test('check flags', async t => {
 	// Copied from `cli.js`
 	let flags = `
@@ -83,6 +205,7 @@ test('check flags', async t => {
 --authentication="username:password"
 --launch-options="{\\"headless\\": false}"
 --dark-mode
+--local-storage="theme=dark"
 --inset=10,-15,-15,25
 --clip=10,30,300,1024
 --no-block-ads

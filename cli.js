@@ -42,9 +42,10 @@ const cli = meow(`
 	  --authentication         Credentials for HTTP authentication
 	  --debug                  Show the browser window to see what it's doing
 	  --dark-mode              Emulate preference of dark color scheme
+	  --local-storage          Set localStorage items before the page loads (Can be set multiple times)
 	  --launch-options         Puppeteer launch options as JSON
 	  --overwrite              Overwrite the destination file if it exists
-	  --inset                  Inset the screenshot relative to the viewport or \`--element\`. Accepts a number or four comma-separated numbers for top, right, left, and bottom.
+	  --inset                  Inset the screenshot relative to the viewport or \`--element\`. Accepts a number or four comma-separated numbers for top, right, bottom, and left.
 	  --clip                   Position and size in the website (clipping region). Accepts comma-separated numbers for x, y, width, and height.
 	  --no-block-ads           Disable ad blocking
 	  --allow-cors             Allow cross-origin requests (useful for local HTML files)
@@ -83,6 +84,7 @@ const cli = meow(`
 	  --authentication="username:password"
 	  --launch-options='{"headless": false}'
 	  --dark-mode
+	  --local-storage="theme=dark"
 	  --inset=10,15,-10,15
 	  --inset=30
 	  --clip=10,30,300,1024
@@ -192,6 +194,10 @@ const cli = meow(`
 		launchOptions: {
 			type: 'string',
 		},
+		localStorage: {
+			type: 'string',
+			isMultiple: true,
+		},
 		overwrite: {
 			type: 'boolean',
 		},
@@ -224,7 +230,24 @@ delete options.script;
 delete options.style;
 delete options.cookie;
 
+function parseKeyValuePairs(items, separator, itemName) {
+	const result = {};
+	for (const item of items) {
+		const [key, value] = splitOnFirst(item, separator);
+		if (!key || value === undefined) {
+			console.error(`Invalid ${itemName} format: "${item}". Use key${separator}value format.`);
+			process.exit(1);
+		}
+
+		result[key.trim()] = value.trim();
+	}
+
+	return result;
+}
+
 options.launchOptions &&= JSON.parse(options.launchOptions);
+
+options.localStorage &&= parseKeyValuePairs(options.localStorage, '=', 'localStorage');
 
 if (options.clip) {
 	const [x, y, width, height] = options.clip.split(',').map(chunk => Number.parseInt(chunk, 10));
@@ -233,13 +256,12 @@ if (options.clip) {
 	};
 }
 
-options.headers = {};
-for (const header of options.header) {
-	const [key, value] = header.split(':');
-	options.headers[key.trim()] = value.trim();
+if (options.header) {
+	options.headers = parseKeyValuePairs(options.header, ':', 'header');
+	delete options.header;
+} else {
+	options.headers = {};
 }
-
-delete options.header;
 
 if (options.authentication) {
 	const [username, password] = splitOnFirst(options.authentication, ':');
