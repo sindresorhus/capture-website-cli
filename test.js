@@ -32,6 +32,28 @@ testFunction('support HTML input', async t => {
 	t.is(mime, 'image/png');
 });
 
+test('error handling for invalid URLs', async t => {
+	const error = await t.throwsAsync(execa('./cli.js', [
+		'http://this-domain-does-not-exist-12345.com',
+		'--output=test-error.png',
+		'--timeout=3',
+	]));
+
+	t.true(error.stderr.includes('ERR_NAME_NOT_RESOLVED'));
+	t.is(error.exitCode, 1);
+});
+
+test('error handling for timeout', async t => {
+	const error = await t.throwsAsync(execa('./cli.js', [
+		'https://httpbin.org/delay/10',
+		'--output=test-timeout.png',
+		'--timeout=2',
+	]));
+
+	t.true(error.stderr.includes('Navigation timeout'));
+	t.is(error.exitCode, 1);
+});
+
 test('check flags', async t => {
 	// Copied from `cli.js`
 	let flags = `

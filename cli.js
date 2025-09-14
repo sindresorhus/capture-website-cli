@@ -308,4 +308,9 @@ async function main() {
 	}
 }
 
-await main();
+try {
+	await main();
+} catch (error) {
+	console.error(error.message);
+	process.exit(1);
+}
