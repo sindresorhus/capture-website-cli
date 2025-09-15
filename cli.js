@@ -50,6 +50,7 @@ const cli = meow(`
 	  --no-block-ads           Disable ad blocking
 	  --allow-cors             Allow cross-origin requests (useful for local HTML files)
 	  --wait-for-network-idle  Wait for network connections to finish
+	  --insecure               Accept self-signed and invalid SSL certificates
 
 	Examples
 	  $ capture-website https://sindresorhus.com --output=screenshot.png
@@ -90,6 +91,7 @@ const cli = meow(`
 	  --clip=10,30,300,1024
 	  --allow-cors
 	  --wait-for-network-idle
+	  --insecure
 `, {
 	importMeta: import.meta,
 	flags: {
@@ -214,6 +216,9 @@ const cli = meow(`
 		waitForNetworkIdle: {
 			type: 'boolean',
 		},
+		insecure: {
+			type: 'boolean',
+		},
 	},
 });
 
@@ -246,6 +251,13 @@ function parseKeyValuePairs(items, separator, itemName) {
 }
 
 options.launchOptions &&= JSON.parse(options.launchOptions);
+
+if (options.insecure) {
+	options.launchOptions = {
+		acceptInsecureCerts: true,
+		...options.launchOptions,
+	};
+}
 
 options.localStorage &&= parseKeyValuePairs(options.localStorage, '=', 'localStorage');
 

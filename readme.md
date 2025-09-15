@@ -61,6 +61,7 @@ $ capture-website --help
     --no-block-ads           Disable ad blocking
     --allow-cors             Allow cross-origin requests (useful for local HTML files)
     --wait-for-network-idle  Wait for network connections to finish
+    --insecure               Accept self-signed and invalid SSL certificates
 
   Examples
     $ capture-website https://sindresorhus.com --output=screenshot.png
@@ -101,11 +102,16 @@ $ capture-website --help
     --no-block-ads
     --allow-cors
     --wait-for-network-idle
+    --insecure
 ```
 
 ## FAQ
 
 [More here.](https://github.com/sindresorhus/capture-website#faq)
+
+### How do I capture websites with self-signed certificates?
+
+Use the `--insecure` flag to bypass certificate validation.
 
 ### How can I capture websites from a file with URLs?
 
