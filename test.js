@@ -4,11 +4,22 @@ import {execa} from 'execa';
 import createTestServer from 'create-test-server';
 import {fileTypeFromBuffer} from 'file-type';
 
+function createHtmlPage(bodyContent) {
+	return `
+		<!doctype html>
+		<html>
+		<body>
+			${bodyContent}
+		</body>
+		</html>
+	`;
+}
+
 test('main', async t => {
 	const server = await createTestServer();
 
 	server.get('/', (request, response) => {
-		response.end('<body>Unicorn</body>');
+		response.end(createHtmlPage('Unicorn'));
 	});
 
 	const {stdout} = await execa('./cli.js', [server.url], {encoding: 'buffer'});
@@ -58,19 +69,14 @@ test('localStorage flag sets localStorage before page load', async t => {
 	const server = await createTestServer();
 
 	server.get('/', (request, response) => {
-		response.end(`
-			<!DOCTYPE html>
-			<html>
-			<body>
-				<div id="result">
-					<script>
-						const value = localStorage.getItem('testKey');
-						document.write(value === 'testValue' ? 'SUCCESS' : 'FAIL');
-					</script>
-				</div>
-			</body>
-			</html>
-		`);
+		response.end(createHtmlPage(`
+			<div id="result">
+				<script>
+					const value = localStorage.getItem('testKey');
+					document.write(value === 'testValue' ? 'SUCCESS' : 'FAIL');
+				</script>
+			</div>
+		`));
 	});
 
 	const {stdout} = await execa('./cli.js', [
@@ -88,20 +94,15 @@ test('localStorage flag handles multiple key-value pairs', async t => {
 	const server = await createTestServer();
 
 	server.get('/', (request, response) => {
-		response.end(`
-			<!DOCTYPE html>
-			<html>
-			<body>
-				<div id="result">
-					<script>
-						const key1 = localStorage.getItem('key1');
-						const key2 = localStorage.getItem('key2');
-						document.write((key1 === 'value1' && key2 === 'value2') ? 'SUCCESS' : 'FAIL');
-					</script>
-				</div>
-			</body>
-			</html>
-		`);
+		response.end(createHtmlPage(`
+			<div id="result">
+				<script>
+					const key1 = localStorage.getItem('key1');
+					const key2 = localStorage.getItem('key2');
+					document.write((key1 === 'value1' && key2 === 'value2') ? 'SUCCESS' : 'FAIL');
+				</script>
+			</div>
+		`));
 	});
 
 	const {stdout} = await execa('./cli.js', [
@@ -131,25 +132,20 @@ test('localStorage flag handles edge cases', async t => {
 	const server = await createTestServer();
 
 	server.get('/', (request, response) => {
-		response.end(`
-			<!DOCTYPE html>
-			<html>
-			<body>
-				<div id="result">
-					<script>
-						const emptyValue = localStorage.getItem('emptyKey');
-						const equalsValue = localStorage.getItem('equalsKey');
-						const trimmedKey = localStorage.getItem('trimmedKey');
-						document.write([
-							emptyValue === '',
-							equalsValue === 'value=with=equals',
-							trimmedKey === 'trimmed value'
-						].every(Boolean) ? 'SUCCESS' : 'FAIL');
-					</script>
-				</div>
-			</body>
-			</html>
-		`);
+		response.end(createHtmlPage(`
+			<div id="result">
+				<script>
+					const emptyValue = localStorage.getItem('emptyKey');
+					const equalsValue = localStorage.getItem('equalsKey');
+					const trimmedKey = localStorage.getItem('trimmedKey');
+					document.write([
+						emptyValue === '',
+						equalsValue === 'value=with=equals',
+						trimmedKey === 'trimmed value'
+					].every(Boolean) ? 'SUCCESS' : 'FAIL');
+				</script>
+			</div>
+		`));
 	});
 
 	const {stdout} = await execa('./cli.js', [
@@ -174,6 +170,35 @@ test('localStorage flag validates empty key', async t => {
 
 	t.true(error.stderr.includes('Invalid localStorage format'));
 	t.is(error.exitCode, 1);
+});
+
+test('wait-for-element flag works correctly', async t => {
+	const server = await createTestServer();
+
+	server.get('/', (request, response) => {
+		response.end(createHtmlPage(`
+			<div id="loading">Loading...</div>
+			<script>
+				setTimeout(() => {
+					const div = document.createElement('div');
+					div.id = 'ready';
+					div.textContent = 'Ready!';
+					document.body.appendChild(div);
+				}, 1000);
+			</script>
+		`));
+	});
+
+	const {stdout} = await execa('./cli.js', [
+		server.url,
+		'--wait-for-element=#ready',
+		'--timeout=10',
+	], {encoding: 'buffer'});
+
+	const {mime} = await fileTypeFromBuffer(stdout);
+	t.is(mime, 'image/png');
+
+	await server.close();
 });
 
 test('check flags', async t => {
