@@ -113,6 +113,17 @@ $ capture-website --help
 
 Use the `--insecure` flag to bypass certificate validation.
 
+### I'm getting connection errors (ECONNREFUSED), what can I do?
+
+Network connectivity issues can occur due to:
+
+- **Slow networks**: Increase timeout with `--timeout=60` (or higher)
+- **Corporate firewalls**: May block network requests
+- **VPN/proxy issues**: Try disabling VPN or configuring proxy settings
+- **IPv6 issues**: Some networks have IPv6 connectivity problems
+
+Try testing with a simple site first: `capture-website https://example.com --output=test.png`
+
 ### How can I capture websites from a file with URLs?
 
 Lets say you have a file named `urls.txt` with:
