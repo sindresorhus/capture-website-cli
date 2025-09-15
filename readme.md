@@ -25,6 +25,7 @@ $ capture-website --help
 
   Options
     --output                 Image file path (writes it to stdout if omitted)
+    --auto-output            Automatically generate output filename from URL/input
     --width                  Page width  [default: 1280]
     --height                 Page height  [default: 800]
     --type                   Image type: png|jpeg|webp  [default: png]
@@ -65,6 +66,7 @@ $ capture-website --help
 
   Examples
     $ capture-website https://sindresorhus.com --output=screenshot.png
+    $ capture-website https://sindresorhus.com --auto-output
     $ capture-website index.html --output=screenshot.png
     $ echo "<h1>Unicorn</h1>" | capture-website --output=screenshot.png
     $ capture-website https://sindresorhus.com | open -f -a Preview
@@ -103,6 +105,7 @@ $ capture-website --help
     --allow-cors
     --wait-for-network-idle
     --insecure
+    --auto-output
 ```
 
 ## FAQ
@@ -124,9 +127,18 @@ Network connectivity issues can occur due to:
 
 Try testing with a simple site first: `capture-website https://example.com --output=test.png`
 
+### How does `--auto-output` work?
+
+It automatically generates filenames based on the input:
+- URLs: `example.com.png`
+- Files: `index.png` (from `index.html`)
+- Stdin: `screenshot.png`
+
+If a file already exists, it increments: `example.com (1).png`, `example.com (2).png`, etc.
+
 ### How can I capture websites from a file with URLs?
 
-Lets say you have a file named `urls.txt` with:
+Let's say you have a file named `urls.txt` with:
 
 ```
 https://sindresorhus.com
@@ -136,11 +148,15 @@ https://github.com
 You can run this:
 
 ```sh
-filename='urls.txt'
+# With auto-output (simpler)
+while read url; do
+  capture-website "$url" --auto-output
+done < urls.txt
 
+# Or with custom naming
 while read url; do
   capture-website "$url" --output "screenshot-$(echo "$url" | sed -e 's/[^A-Za-z0-9._-]//g').png"
-done < "$filename"
+done < urls.txt
 ```
 
 ## Related

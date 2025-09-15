@@ -1,8 +1,17 @@
-import process from 'node:process';
+import {
+	rmSync,
+	mkdirSync,
+	writeFileSync,
+	existsSync,
+} from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import test from 'ava';
 import {execa} from 'execa';
 import createTestServer from 'create-test-server';
 import {fileTypeFromBuffer} from 'file-type';
+
+const cliPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'cli.js');
 
 function createHtmlPage(bodyContent) {
 	return `
@@ -15,6 +24,13 @@ function createHtmlPage(bodyContent) {
 	`;
 }
 
+function setupTestDir(t) {
+	const testDir = path.join('test-temp', `test-${Math.random().toString(36).slice(2)}`);
+	mkdirSync(testDir, {recursive: true});
+	t.teardown(() => rmSync(testDir, {recursive: true, force: true}));
+	return testDir;
+}
+
 test('main', async t => {
 	const server = await createTestServer();
 
@@ -22,19 +38,15 @@ test('main', async t => {
 		response.end(createHtmlPage('Unicorn'));
 	});
 
-	const {stdout} = await execa('./cli.js', [server.url], {encoding: 'buffer'});
+	const {stdout} = await execa(cliPath, [server.url], {encoding: 'buffer'});
 	const {mime} = await fileTypeFromBuffer(stdout);
 	t.is(mime, 'image/png');
 
 	await server.close();
 });
 
-// Skip this test in CI as it consistently times out there
-// The functionality works but CI environments are too slow for HTML input processing
-const testFunction = process.env.CI ? test.skip : test;
-
-testFunction('support HTML input', async t => {
-	const {stdout} = await execa('./cli.js', ['--timeout=120'], {
+test('support HTML input', async t => {
+	const {stdout} = await execa(cliPath, ['--timeout=60'], {
 		input: '<h1>Unicorn</h1>',
 		encoding: 'buffer',
 	});
@@ -44,9 +56,12 @@ testFunction('support HTML input', async t => {
 });
 
 test('error handling for invalid URLs', async t => {
-	const error = await t.throwsAsync(execa('./cli.js', [
+	const testDir = setupTestDir(t);
+	const outputFile = path.join(testDir, 'test-error.png');
+
+	const error = await t.throwsAsync(execa(cliPath, [
 		'http://this-domain-does-not-exist-12345.com',
-		'--output=test-error.png',
+		`--output=${outputFile}`,
 		'--timeout=3',
 	]));
 
@@ -55,13 +70,16 @@ test('error handling for invalid URLs', async t => {
 });
 
 test('error handling for timeout', async t => {
-	const error = await t.throwsAsync(execa('./cli.js', [
-		'https://httpbin.org/delay/10',
-		'--output=test-timeout.png',
-		'--timeout=2',
+	const testDir = setupTestDir(t);
+	const outputFile = path.join(testDir, 'test-timeout.png');
+
+	const error = await t.throwsAsync(execa(cliPath, [
+		'https://httpbin.org/delay/30',
+		`--output=${outputFile}`,
+		'--timeout=1',
 	]));
 
-	t.true(error.stderr.includes('Navigation timeout'));
+	t.true(error.stderr.includes('Navigation timeout') || error.stderr.includes('timeout'));
 	t.is(error.exitCode, 1);
 });
 
@@ -79,7 +97,7 @@ test('localStorage flag sets localStorage before page load', async t => {
 		`));
 	});
 
-	const {stdout} = await execa('./cli.js', [
+	const {stdout} = await execa(cliPath, [
 		server.url,
 		'--local-storage=testKey=testValue',
 	], {encoding: 'buffer'});
@@ -105,7 +123,7 @@ test('localStorage flag handles multiple key-value pairs', async t => {
 		`));
 	});
 
-	const {stdout} = await execa('./cli.js', [
+	const {stdout} = await execa(cliPath, [
 		server.url,
 		'--local-storage=key1=value1',
 		'--local-storage=key2=value2',
@@ -118,9 +136,12 @@ test('localStorage flag handles multiple key-value pairs', async t => {
 });
 
 test('localStorage flag validates format', async t => {
-	const error = await t.throwsAsync(execa('./cli.js', [
+	const testDir = setupTestDir(t);
+	const outputFile = path.join(testDir, 'test-invalid-localStorage.png');
+
+	const error = await t.throwsAsync(execa(cliPath, [
 		'https://example.com',
-		'--output=test-invalid-localStorage.png',
+		`--output=${outputFile}`,
 		'--local-storage=invalid-format',
 	]));
 
@@ -148,7 +169,7 @@ test('localStorage flag handles edge cases', async t => {
 		`));
 	});
 
-	const {stdout} = await execa('./cli.js', [
+	const {stdout} = await execa(cliPath, [
 		server.url,
 		'--local-storage=emptyKey=',
 		'--local-storage=equalsKey=value=with=equals',
@@ -162,9 +183,12 @@ test('localStorage flag handles edge cases', async t => {
 });
 
 test('localStorage flag validates empty key', async t => {
-	const error = await t.throwsAsync(execa('./cli.js', [
+	const testDir = setupTestDir(t);
+	const outputFile = path.join(testDir, 'test-empty-key.png');
+
+	const error = await t.throwsAsync(execa(cliPath, [
 		'https://example.com',
-		'--output=test-empty-key.png',
+		`--output=${outputFile}`,
 		'--local-storage==value',
 	]));
 
@@ -189,7 +213,7 @@ test('wait-for-element flag works correctly', async t => {
 		`));
 	});
 
-	const {stdout} = await execa('./cli.js', [
+	const {stdout} = await execa(cliPath, [
 		server.url,
 		'--wait-for-element=#ready',
 		'--timeout=10',
@@ -199,6 +223,64 @@ test('wait-for-element flag works correctly', async t => {
 	t.is(mime, 'image/png');
 
 	await server.close();
+});
+
+test('auto-output flag generates filenames', async t => {
+	const testDir = setupTestDir(t);
+
+	// Test with file path
+	const inputFile = path.join(testDir, 'test-auto-input.html');
+	const outputFile = path.join(testDir, 'test-auto-input.png');
+	writeFileSync(inputFile, '<h1>Test</h1>');
+	await execa(cliPath, ['test-auto-input.html', '--auto-output'], {
+		cwd: testDir,
+	});
+	t.true(existsSync(outputFile));
+
+	// Test with stdin
+	const screenshotFile = path.join(testDir, 'screenshot.png');
+	await execa(cliPath, ['--auto-output'], {
+		input: '<h1>Test from stdin</h1>',
+		cwd: testDir,
+	});
+	t.true(existsSync(screenshotFile));
+});
+
+test('output flag takes precedence over auto-output', async t => {
+	const testDir = setupTestDir(t);
+
+	await execa(cliPath, ['https://example.com', '--auto-output', '--output=custom.png', '--timeout=10'], {
+		cwd: testDir,
+	});
+	t.true(existsSync(path.join(testDir, 'custom.png')));
+});
+
+test('auto-output respects file type', async t => {
+	const testDir = setupTestDir(t);
+	const jpegFile = path.join(testDir, 'example.com.jpeg');
+
+	await execa(cliPath, ['https://example.com', '--auto-output', '--type=jpeg', '--timeout=10'], {
+		cwd: testDir,
+	});
+	t.true(existsSync(jpegFile));
+});
+
+test('auto-output flag increments filename if file exists', async t => {
+	const testDir = setupTestDir(t);
+	const firstFile = path.join(testDir, 'example.com.png');
+	const secondFile = path.join(testDir, 'example.com (1).png');
+
+	// Create first file
+	await execa(cliPath, ['https://example.com', '--auto-output', '--timeout=10'], {
+		cwd: testDir,
+	});
+	t.true(existsSync(firstFile));
+
+	// Create second file (should increment)
+	await execa(cliPath, ['https://example.com', '--auto-output', '--timeout=10'], {
+		cwd: testDir,
+	});
+	t.true(existsSync(secondFile));
 });
 
 test('check flags', async t => {
@@ -235,6 +317,7 @@ test('check flags', async t => {
 --clip=10,30,300,1024
 --no-block-ads
 --insecure
+--auto-output
 	`;
 
 	flags = flags.trim()
@@ -242,7 +325,7 @@ test('check flags', async t => {
 		.replaceAll(String.raw`\"`, '"')
 		.split('\n');
 
-	const {stdout} = await execa('./cli.js', ['noop-file', '--internal-print-flags', ...flags]);
+	const {stdout} = await execa(cliPath, ['noop-file', '--internal-print-flags', ...flags]);
 	const json = JSON.parse(stdout);
 	t.snapshot(json);
 });

@@ -6,6 +6,8 @@ import meow from 'meow';
 import captureWebsite from 'capture-website';
 import splitOnFirst from 'split-on-first';
 import getStdin from 'get-stdin';
+import {unusedFilename} from 'unused-filename';
+import filenamifyUrl from 'filenamify-url';
 
 const cli = meow(`
 	Usage
@@ -14,6 +16,7 @@ const cli = meow(`
 
 	Options
 	  --output                 Image file path (writes it to stdout if omitted)
+	  --auto-output            Automatically generate output filename from URL/input
 	  --width                  Page width  [default: 1280]
 	  --height                 Page height  [default: 800]
 	  --type                   Image type: png|jpeg|webp  [default: png]
@@ -54,6 +57,7 @@ const cli = meow(`
 
 	Examples
 	  $ capture-website https://sindresorhus.com --output=screenshot.png
+	  $ capture-website https://sindresorhus.com --auto-output
 	  $ capture-website index.html --output=screenshot.png
 	  $ echo "<h1>Unicorn</h1>" | capture-website --output=screenshot.png
 	  $ capture-website https://sindresorhus.com | open -f -a Preview
@@ -97,6 +101,9 @@ const cli = meow(`
 	flags: {
 		output: {
 			type: 'string',
+		},
+		autoOutput: {
+			type: 'boolean',
 		},
 		width: {
 			type: 'number',
@@ -304,11 +311,35 @@ if (options.inset) {
 
 options.isJavaScriptEnabled = options.javascript;
 
+async function generateAutoFilename(input, type, inputType) {
+	let filename = 'screenshot';
+
+	if (inputType !== 'html') {
+		try {
+			// Try to parse as URL
+			const url = new URL(input);
+			if (url.protocol === 'http:' || url.protocol === 'https:') {
+				filename = filenamifyUrl(input);
+			}
+		} catch {
+			// It's a file path
+			const basename = path.basename(input, path.extname(input));
+			if (basename) {
+				filename = basename;
+			}
+		}
+	}
+
+	// Get unused filename (handles increments if file exists)
+	return unusedFilename(`${filename}.${type}`);
+}
+
 async function main() {
 	const {
 		internalPrintFlags,
 		listDevices,
 		output,
+		autoOutput,
 	} = options;
 
 	if (internalPrintFlags) {
@@ -331,12 +362,18 @@ async function main() {
 		process.exit(1);
 	}
 
-	if (output) {
+	// Handle auto-output flag
+	let finalOutput = output;
+	if (autoOutput && !output) {
+		finalOutput = await generateAutoFilename(input, options.type || 'png', options.inputType);
+	}
+
+	if (finalOutput) {
 		// Ensure the directory exists when using --overwrite
-		const outputDirectory = path.dirname(output);
+		const outputDirectory = path.dirname(finalOutput);
 		await mkdir(outputDirectory, {recursive: true});
 
-		await captureWebsite.file(input, output, options);
+		await captureWebsite.file(input, finalOutput, options);
 	} else {
 		process.stdout.write(await captureWebsite.buffer(input, options));
 	}
