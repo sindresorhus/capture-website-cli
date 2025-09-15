@@ -18,7 +18,7 @@
 		"node": ">=20"
 	},
 	"scripts": {
-		"test": "xo && ava"
+		"test": "xo && node --test"
 	},
 	"files": [
 		"cli.js"
@@ -49,13 +49,9 @@
 		"unused-filename": "^4.0.1"
 	},
 	"devDependencies": {
-		"ava": "^6.4.1",
 		"create-test-server": "^3.0.1",
 		"execa": "^9.6.0",
 		"file-type": "^21.0.0",
 		"xo": "^1.2.2"
-	},
-	"ava": {
-		"timeout": "5m"
 	}
 }

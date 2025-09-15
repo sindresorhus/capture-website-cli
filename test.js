@@ -6,7 +6,8 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import test from 'ava';
+import {test, after} from 'node:test';
+import assert from 'node:assert/strict';
 import {execa} from 'execa';
 import createTestServer from 'create-test-server';
 import {fileTypeFromBuffer} from 'file-type';
@@ -24,14 +25,19 @@ function createHtmlPage(bodyContent) {
 	`;
 }
 
-function setupTestDir(t) {
-	const testDir = path.join('test-temp', `test-${Math.random().toString(36).slice(2)}`);
-	mkdirSync(testDir, {recursive: true});
-	t.teardown(() => rmSync(testDir, {recursive: true, force: true}));
-	return testDir;
+function setupTestDirectory() {
+	const testDirectory = path.join('test-temp', `test-${Math.random().toString(36).slice(2)}`);
+	mkdirSync(testDirectory, {recursive: true});
+	return testDirectory;
 }
 
-test('main', async t => {
+function cleanupTestDirectory(testDirectory) {
+	if (existsSync(testDirectory)) {
+		rmSync(testDirectory, {recursive: true, force: true});
+	}
+}
+
+test('main', async () => {
 	const server = await createTestServer();
 
 	server.get('/', (request, response) => {
@@ -40,50 +46,66 @@ test('main', async t => {
 
 	const {stdout} = await execa(cliPath, [server.url], {encoding: 'buffer'});
 	const {mime} = await fileTypeFromBuffer(stdout);
-	t.is(mime, 'image/png');
+	assert.equal(mime, 'image/png');
 
 	await server.close();
 });
 
-test('support HTML input', async t => {
+test('support HTML input', async () => {
 	const {stdout} = await execa(cliPath, ['--timeout=60'], {
 		input: '<h1>Unicorn</h1>',
 		encoding: 'buffer',
 	});
 
 	const {mime} = await fileTypeFromBuffer(stdout);
-	t.is(mime, 'image/png');
+	assert.equal(mime, 'image/png');
 });
 
-test('error handling for invalid URLs', async t => {
-	const testDir = setupTestDir(t);
-	const outputFile = path.join(testDir, 'test-error.png');
+test('error handling for invalid URLs', async () => {
+	const testDirectory = setupTestDirectory();
+	const outputFile = path.join(testDirectory, 'test-error.png');
 
-	const error = await t.throwsAsync(execa(cliPath, [
-		'http://this-domain-does-not-exist-12345.com',
-		`--output=${outputFile}`,
-		'--timeout=3',
-	]));
-
-	t.true(error.stderr.includes('ERR_NAME_NOT_RESOLVED'));
-	t.is(error.exitCode, 1);
+	try {
+		await assert.rejects(
+			execa(cliPath, [
+				'http://this-domain-does-not-exist-12345.com',
+				`--output=${outputFile}`,
+				'--timeout=3',
+			]),
+			error => {
+				assert.ok(error.stderr.includes('ERR_NAME_NOT_RESOLVED'));
+				assert.equal(error.exitCode, 1);
+				return true;
+			},
+		);
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
 });
 
-test('error handling for timeout', async t => {
-	const testDir = setupTestDir(t);
-	const outputFile = path.join(testDir, 'test-timeout.png');
+test('error handling for timeout', async () => {
+	const testDirectory = setupTestDirectory();
+	const outputFile = path.join(testDirectory, 'test-timeout.png');
 
-	const error = await t.throwsAsync(execa(cliPath, [
-		'https://httpbin.org/delay/30',
-		`--output=${outputFile}`,
-		'--timeout=1',
-	]));
-
-	t.true(error.stderr.includes('Navigation timeout') || error.stderr.includes('timeout'));
-	t.is(error.exitCode, 1);
+	try {
+		await assert.rejects(
+			execa(cliPath, [
+				'https://httpbin.org/delay/30',
+				`--output=${outputFile}`,
+				'--timeout=1',
+			]),
+			error => {
+				assert.ok(error.stderr.includes('Navigation timeout') || error.stderr.includes('timeout'));
+				assert.equal(error.exitCode, 1);
+				return true;
+			},
+		);
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
 });
 
-test('localStorage flag sets localStorage before page load', async t => {
+test('localStorage flag sets localStorage before page load', async () => {
 	const server = await createTestServer();
 
 	server.get('/', (request, response) => {
@@ -103,12 +125,12 @@ test('localStorage flag sets localStorage before page load', async t => {
 	], {encoding: 'buffer'});
 
 	const {mime} = await fileTypeFromBuffer(stdout);
-	t.is(mime, 'image/png');
+	assert.equal(mime, 'image/png');
 
 	await server.close();
 });
 
-test('localStorage flag handles multiple key-value pairs', async t => {
+test('localStorage flag handles multiple key-value pairs', async () => {
 	const server = await createTestServer();
 
 	server.get('/', (request, response) => {
@@ -130,26 +152,34 @@ test('localStorage flag handles multiple key-value pairs', async t => {
 	], {encoding: 'buffer'});
 
 	const {mime} = await fileTypeFromBuffer(stdout);
-	t.is(mime, 'image/png');
+	assert.equal(mime, 'image/png');
 
 	await server.close();
 });
 
-test('localStorage flag validates format', async t => {
-	const testDir = setupTestDir(t);
-	const outputFile = path.join(testDir, 'test-invalid-localStorage.png');
+test('localStorage flag validates format', async () => {
+	const testDirectory = setupTestDirectory();
+	const outputFile = path.join(testDirectory, 'test-invalid-localStorage.png');
 
-	const error = await t.throwsAsync(execa(cliPath, [
-		'https://example.com',
-		`--output=${outputFile}`,
-		'--local-storage=invalid-format',
-	]));
-
-	t.true(error.stderr.includes('Invalid localStorage format'));
-	t.is(error.exitCode, 1);
+	try {
+		await assert.rejects(
+			execa(cliPath, [
+				'https://example.com',
+				`--output=${outputFile}`,
+				'--local-storage=invalid-format',
+			]),
+			error => {
+				assert.ok(error.stderr.includes('Invalid localStorage format'));
+				assert.equal(error.exitCode, 1);
+				return true;
+			},
+		);
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
 });
 
-test('localStorage flag handles edge cases', async t => {
+test('localStorage flag handles edge cases', async () => {
 	const server = await createTestServer();
 
 	server.get('/', (request, response) => {
@@ -177,26 +207,34 @@ test('localStorage flag handles edge cases', async t => {
 	], {encoding: 'buffer'});
 
 	const {mime} = await fileTypeFromBuffer(stdout);
-	t.is(mime, 'image/png');
+	assert.equal(mime, 'image/png');
 
 	await server.close();
 });
 
-test('localStorage flag validates empty key', async t => {
-	const testDir = setupTestDir(t);
-	const outputFile = path.join(testDir, 'test-empty-key.png');
+test('localStorage flag validates empty key', async () => {
+	const testDirectory = setupTestDirectory();
+	const outputFile = path.join(testDirectory, 'test-empty-key.png');
 
-	const error = await t.throwsAsync(execa(cliPath, [
-		'https://example.com',
-		`--output=${outputFile}`,
-		'--local-storage==value',
-	]));
-
-	t.true(error.stderr.includes('Invalid localStorage format'));
-	t.is(error.exitCode, 1);
+	try {
+		await assert.rejects(
+			execa(cliPath, [
+				'https://example.com',
+				`--output=${outputFile}`,
+				'--local-storage==value',
+			]),
+			error => {
+				assert.ok(error.stderr.includes('Invalid localStorage format'));
+				assert.equal(error.exitCode, 1);
+				return true;
+			},
+		);
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
 });
 
-test('wait-for-element flag works correctly', async t => {
+test('wait-for-element flag works correctly', async () => {
 	const server = await createTestServer();
 
 	server.get('/', (request, response) => {
@@ -220,70 +258,87 @@ test('wait-for-element flag works correctly', async t => {
 	], {encoding: 'buffer'});
 
 	const {mime} = await fileTypeFromBuffer(stdout);
-	t.is(mime, 'image/png');
+	assert.equal(mime, 'image/png');
 
 	await server.close();
 });
 
-test('auto-output flag generates filenames', async t => {
-	const testDir = setupTestDir(t);
+test('auto-output flag generates filenames', async () => {
+	const testDirectory = setupTestDirectory();
 
-	// Test with file path
-	const inputFile = path.join(testDir, 'test-auto-input.html');
-	const outputFile = path.join(testDir, 'test-auto-input.png');
-	writeFileSync(inputFile, '<h1>Test</h1>');
-	await execa(cliPath, ['test-auto-input.html', '--auto-output'], {
-		cwd: testDir,
-	});
-	t.true(existsSync(outputFile));
+	try {
+		// Test with file path
+		const inputFile = path.join(testDirectory, 'test-auto-input.html');
+		const outputFile = path.join(testDirectory, 'test-auto-input.png');
+		writeFileSync(inputFile, '<h1>Test</h1>');
+		await execa(cliPath, ['test-auto-input.html', '--auto-output'], {
+			cwd: testDirectory,
+		});
+		assert.ok(existsSync(outputFile));
 
-	// Test with stdin
-	const screenshotFile = path.join(testDir, 'screenshot.png');
-	await execa(cliPath, ['--auto-output'], {
-		input: '<h1>Test from stdin</h1>',
-		cwd: testDir,
-	});
-	t.true(existsSync(screenshotFile));
+		// Test with stdin
+		const screenshotFile = path.join(testDirectory, 'screenshot.png');
+		await execa(cliPath, ['--auto-output'], {
+			input: '<h1>Test from stdin</h1>',
+			cwd: testDirectory,
+		});
+		assert.ok(existsSync(screenshotFile));
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
 });
 
-test('output flag takes precedence over auto-output', async t => {
-	const testDir = setupTestDir(t);
+test('output flag takes precedence over auto-output', async () => {
+	const testDirectory = setupTestDirectory();
 
-	await execa(cliPath, ['https://example.com', '--auto-output', '--output=custom.png', '--timeout=10'], {
-		cwd: testDir,
-	});
-	t.true(existsSync(path.join(testDir, 'custom.png')));
+	try {
+		await execa(cliPath, ['https://example.com', '--auto-output', '--output=custom.png', '--timeout=10'], {
+			cwd: testDirectory,
+		});
+		assert.ok(existsSync(path.join(testDirectory, 'custom.png')));
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
 });
 
-test('auto-output respects file type', async t => {
-	const testDir = setupTestDir(t);
-	const jpegFile = path.join(testDir, 'example.com.jpeg');
+test('auto-output respects file type', async () => {
+	const testDirectory = setupTestDirectory();
 
-	await execa(cliPath, ['https://example.com', '--auto-output', '--type=jpeg', '--timeout=10'], {
-		cwd: testDir,
-	});
-	t.true(existsSync(jpegFile));
+	try {
+		const jpegFile = path.join(testDirectory, 'example.com.jpeg');
+		await execa(cliPath, ['https://example.com', '--auto-output', '--type=jpeg', '--timeout=10'], {
+			cwd: testDirectory,
+		});
+		assert.ok(existsSync(jpegFile));
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
 });
 
-test('auto-output flag increments filename if file exists', async t => {
-	const testDir = setupTestDir(t);
-	const firstFile = path.join(testDir, 'example.com.png');
-	const secondFile = path.join(testDir, 'example.com (1).png');
+test('auto-output flag increments filename if file exists', async () => {
+	const testDirectory = setupTestDirectory();
 
-	// Create first file
-	await execa(cliPath, ['https://example.com', '--auto-output', '--timeout=10'], {
-		cwd: testDir,
-	});
-	t.true(existsSync(firstFile));
+	try {
+		const firstFile = path.join(testDirectory, 'example.com.png');
+		const secondFile = path.join(testDirectory, 'example.com (1).png');
 
-	// Create second file (should increment)
-	await execa(cliPath, ['https://example.com', '--auto-output', '--timeout=10'], {
-		cwd: testDir,
-	});
-	t.true(existsSync(secondFile));
+		// Create first file
+		await execa(cliPath, ['https://example.com', '--auto-output', '--timeout=10'], {
+			cwd: testDirectory,
+		});
+		assert.ok(existsSync(firstFile));
+
+		// Create second file (should increment)
+		await execa(cliPath, ['https://example.com', '--auto-output', '--timeout=10'], {
+			cwd: testDirectory,
+		});
+		assert.ok(existsSync(secondFile));
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
 });
 
-test('check flags', async t => {
+test('check flags', async () => {
 	// Copied from `cli.js`
 	let flags = `
 --output=screenshot.png
@@ -327,5 +382,88 @@ test('check flags', async t => {
 
 	const {stdout} = await execa(cliPath, ['noop-file', '--internal-print-flags', ...flags]);
 	const json = JSON.parse(stdout);
-	t.snapshot(json);
+
+	// Verify the parsed flags structure
+	const expected = {
+		allowCors: false,
+		authentication: {
+			password: 'password',
+			username: 'username',
+		},
+		autoOutput: true,
+		blockAds: false,
+		clickElement: 'button',
+		clip: {
+			height: 1024,
+			width: 300,
+			x: 10,
+			y: 30,
+		},
+		cookies: [
+			'id=unicorn; Expires=Wed, 21 Oct 2018 07:28:00 GMT;',
+		],
+		darkMode: true,
+		debug: false,
+		defaultBackground: false,
+		delay: 10,
+		disableAnimations: true,
+		element: '.main-content',
+		emulateDevice: 'iPhone X',
+		fullPage: false,
+		headers: {
+			'x-powered-by': 'capture-website-cli',
+		},
+		height: 600,
+		hideElements: [
+			'.sidebar',
+		],
+		insecure: true,
+		inset: {
+			bottom: -15,
+			left: 25,
+			right: -15,
+			top: 10,
+		},
+		internalPrintFlags: true,
+		isJavaScriptEnabled: false,
+		javascript: false,
+		launchOptions: {
+			acceptInsecureCerts: true,
+			headless: false,
+		},
+		listDevices: false,
+		localStorage: {
+			theme: 'dark',
+		},
+		modules: [
+			'https://sindresorhus.com/remote-file.js',
+			'local-file.js',
+			'document.body.style.backgroundColor = \'red\'',
+		],
+		output: 'screenshot.png',
+		overwrite: false,
+		quality: 0.5,
+		removeElements: [
+			'img.ad',
+		],
+		scaleFactor: 3,
+		scripts: [],
+		scrollToElement: '#map',
+		styles: [],
+		timeout: 80,
+		type: 'jpeg.',
+		userAgent: 'I love unicorns',
+		waitForElement: '#header',
+		waitForNetworkIdle: false,
+		width: 1000,
+	};
+
+	assert.deepStrictEqual(json, expected);
+});
+
+// Clean up test-temp directory after all tests
+after(() => {
+	if (existsSync('test-temp')) {
+		rmSync('test-temp', {recursive: true, force: true});
+	}
 });
