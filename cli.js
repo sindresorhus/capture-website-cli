@@ -54,6 +54,14 @@ const cli = meow(`
 	  --allow-cors             Allow cross-origin requests (useful for local HTML files)
 	  --wait-for-network-idle  Wait for network connections to finish
 	  --insecure               Accept self-signed and invalid SSL certificates
+	  --preload-lazy-content   Scroll through entire page to trigger lazy-loaded content before capture
+	  --referrer               Custom referrer header for navigation
+	  --throw-on-http-error    Throw error on non-2xx HTTP status codes
+	  --log-console            Redirect page console output to terminal
+	  --pdf-format             Paper format: letter|legal|tabloid|ledger|a0|a1|a2|a3|a4|a5|a6  [default: letter]
+	  --pdf-landscape          Use landscape orientation for PDF
+	  --pdf-margin             Page margins. Accepts a number/string or four comma-separated values for top, right, bottom, and left.
+	  --pdf-background         Include background graphics in PDF
 
 	Examples
 	  $ capture-website https://sindresorhus.com --output=screenshot.png
@@ -96,6 +104,15 @@ const cli = meow(`
 	  --allow-cors
 	  --wait-for-network-idle
 	  --insecure
+	  --preload-lazy-content
+	  --referrer="https://google.com"
+	  --throw-on-http-error
+	  --log-console
+	  --pdf-format=a4
+	  --pdf-landscape
+	  --pdf-margin=1in
+	  --pdf-margin=1in,0.5in,1in,0.5in
+	  --pdf-background
 `, {
 	importMeta: import.meta,
 	flags: {
@@ -226,6 +243,30 @@ const cli = meow(`
 		insecure: {
 			type: 'boolean',
 		},
+		preloadLazyContent: {
+			type: 'boolean',
+		},
+		referrer: {
+			type: 'string',
+		},
+		throwOnHttpError: {
+			type: 'boolean',
+		},
+		logConsole: {
+			type: 'boolean',
+		},
+		pdfFormat: {
+			type: 'string',
+		},
+		pdfLandscape: {
+			type: 'boolean',
+		},
+		pdfMargin: {
+			type: 'string',
+		},
+		pdfBackground: {
+			type: 'boolean',
+		},
 	},
 });
 
@@ -310,6 +351,86 @@ if (options.inset) {
 }
 
 options.isJavaScriptEnabled = options.javascript;
+
+// Process PDF options
+if (options.pdfFormat || options.pdfLandscape || options.pdfMargin !== undefined || options.pdfBackground) {
+	options.pdf = {};
+
+	if (options.pdfFormat) {
+		options.pdf.format = options.pdfFormat;
+	}
+
+	if (options.pdfLandscape) {
+		options.pdf.landscape = options.pdfLandscape;
+	}
+
+	if (options.pdfBackground) {
+		options.pdf.background = options.pdfBackground;
+	}
+
+	if (options.pdfMargin !== undefined) {
+		const values = options.pdfMargin.split(',').map(chunk => chunk.trim());
+
+		// Validate that we have 1 or 4 values
+		if (![1, 4].includes(values.length)) {
+			console.error('Invalid `--pdf-margin` value: must be a single value or four comma-separated values');
+			process.exit(1);
+		}
+
+		// Validate that no values are empty
+		if (values.includes('')) {
+			console.error('Invalid `--pdf-margin` value: empty values not allowed');
+			process.exit(1);
+		}
+
+		// Helper to parse a single margin value
+		const parseMarginValue = value => {
+			// Check if it's a pure number (only digits and optional decimal/negative)
+			const isPureNumber = /^-?\d+(\.\d+)?$/.test(value);
+			if (isPureNumber) {
+				return Number.parseFloat(value);
+			}
+
+			// Keep as string to preserve units (e.g., "1in", "2.5cm")
+			return value;
+		};
+
+		if (values.length === 1) {
+			// Single value for all sides
+			options.pdf.margin = parseMarginValue(values[0]);
+		} else {
+			// Four values for top, right, bottom, left
+			const marginOption = {};
+			const keys = ['top', 'right', 'bottom', 'left'];
+
+			for (const [index, key] of keys.entries()) {
+				marginOption[key] = parseMarginValue(values[index]);
+			}
+
+			options.pdf.margin = marginOption;
+		}
+	}
+
+	delete options.pdfFormat;
+	delete options.pdfLandscape;
+	delete options.pdfMargin;
+	delete options.pdfBackground;
+}
+
+// Add console logging callback
+if (options.logConsole) {
+	options.onConsole = message => {
+		try {
+			const type = message.type();
+			const text = message.text();
+			console.error(`[console.${type}] ${text}`);
+		} catch {
+			// Silently ignore console logging errors to not break screenshot capture
+		}
+	};
+
+	delete options.logConsole;
+}
 
 async function generateAutoFilename(input, type, inputType) {
 	let filename = 'screenshot';

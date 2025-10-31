@@ -435,6 +435,7 @@ test('check flags', async () => {
 		localStorage: {
 			theme: 'dark',
 		},
+		logConsole: false,
 		modules: [
 			'https://sindresorhus.com/remote-file.js',
 			'local-file.js',
@@ -442,6 +443,9 @@ test('check flags', async () => {
 		],
 		output: 'screenshot.png',
 		overwrite: false,
+		pdfBackground: false,
+		pdfLandscape: false,
+		preloadLazyContent: false,
 		quality: 0.5,
 		removeElements: [
 			'img.ad',
@@ -450,6 +454,7 @@ test('check flags', async () => {
 		scripts: [],
 		scrollToElement: '#map',
 		styles: [],
+		throwOnHttpError: false,
 		timeout: 80,
 		type: 'jpeg.',
 		userAgent: 'I love unicorns',
@@ -459,6 +464,264 @@ test('check flags', async () => {
 	};
 
 	assert.deepStrictEqual(json, expected);
+});
+
+test('throwOnHttpError flag throws error on 404', async () => {
+	const testDirectory = setupTestDirectory();
+	const outputFile = path.join(testDirectory, 'test-404.png');
+
+	try {
+		await assert.rejects(
+			execa(cliPath, [
+				'https://httpbin.org/status/404',
+				`--output=${outputFile}`,
+				'--throw-on-http-error',
+				'--timeout=30',
+			]),
+			error => {
+				assert.ok(error.stderr.includes('404') || error.stderr.includes('HTTP'));
+				assert.equal(error.exitCode, 1);
+				return true;
+			},
+		);
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
+});
+
+test('PDF format option', async () => {
+	const testDirectory = setupTestDirectory();
+	const outputFile = path.join(testDirectory, 'test.pdf');
+
+	try {
+		await execa(cliPath, [
+			'https://example.com',
+			`--output=${outputFile}`,
+			'--type=pdf',
+			'--pdf-format=a4',
+			'--timeout=10',
+		]);
+		assert.ok(existsSync(outputFile));
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
+});
+
+test('PDF landscape option', async () => {
+	const testDirectory = setupTestDirectory();
+	const outputFile = path.join(testDirectory, 'test-landscape.pdf');
+
+	try {
+		await execa(cliPath, [
+			'https://example.com',
+			`--output=${outputFile}`,
+			'--type=pdf',
+			'--pdf-landscape',
+			'--timeout=10',
+		]);
+		assert.ok(existsSync(outputFile));
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
+});
+
+test('PDF margin option with single value', async () => {
+	const testDirectory = setupTestDirectory();
+	const outputFile = path.join(testDirectory, 'test-margin.pdf');
+
+	try {
+		await execa(cliPath, [
+			'https://example.com',
+			`--output=${outputFile}`,
+			'--type=pdf',
+			'--pdf-margin=1in',
+			'--timeout=10',
+		]);
+		assert.ok(existsSync(outputFile));
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
+});
+
+test('PDF margin option with four values', async () => {
+	const testDirectory = setupTestDirectory();
+	const outputFile = path.join(testDirectory, 'test-margin-4.pdf');
+
+	try {
+		await execa(cliPath, [
+			'https://example.com',
+			`--output=${outputFile}`,
+			'--type=pdf',
+			'--pdf-margin=1in,0.5in,1in,0.5in',
+			'--timeout=10',
+		]);
+		assert.ok(existsSync(outputFile));
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
+});
+
+test('PDF margin option validates format', async () => {
+	const testDirectory = setupTestDirectory();
+	const outputFile = path.join(testDirectory, 'test-invalid-margin.pdf');
+
+	try {
+		await assert.rejects(
+			execa(cliPath, [
+				'https://example.com',
+				`--output=${outputFile}`,
+				'--type=pdf',
+				'--pdf-margin=1in,2in,3in',
+			]),
+			error => {
+				assert.ok(error.stderr.includes('Invalid'));
+				assert.equal(error.exitCode, 1);
+				return true;
+			},
+		);
+	} finally {
+		cleanupTestDirectory(testDirectory);
+	}
+});
+
+test('PDF margin preserves units', async () => {
+	const {stdout} = await execa(cliPath, [
+		'noop-file',
+		'--internal-print-flags',
+		'--pdf-margin=1in',
+	]);
+
+	const json = JSON.parse(stdout);
+	assert.ok(json.pdf);
+	assert.equal(json.pdf.margin, '1in');
+});
+
+test('PDF margin converts pure numbers', async () => {
+	const {stdout} = await execa(cliPath, [
+		'noop-file',
+		'--internal-print-flags',
+		'--pdf-margin=72',
+	]);
+
+	const json = JSON.parse(stdout);
+	assert.ok(json.pdf);
+	assert.equal(json.pdf.margin, 72);
+});
+
+test('PDF margin preserves units with four values', async () => {
+	const {stdout} = await execa(cliPath, [
+		'noop-file',
+		'--internal-print-flags',
+		'--pdf-margin=1in,0.5in,2cm,10mm',
+	]);
+
+	const json = JSON.parse(stdout);
+	assert.ok(json.pdf);
+	assert.deepStrictEqual(json.pdf.margin, {
+		top: '1in',
+		right: '0.5in',
+		bottom: '2cm',
+		left: '10mm',
+	});
+});
+
+test('PDF margin mixes numbers and units', async () => {
+	const {stdout} = await execa(cliPath, [
+		'noop-file',
+		'--internal-print-flags',
+		'--pdf-margin=72,1in,2.5cm,10',
+	]);
+
+	const json = JSON.parse(stdout);
+	assert.ok(json.pdf);
+	assert.deepStrictEqual(json.pdf.margin, {
+		top: 72,
+		right: '1in',
+		bottom: '2.5cm',
+		left: 10,
+	});
+});
+
+test('PDF margin rejects empty values', async () => {
+	await assert.rejects(
+		execa(cliPath, [
+			'noop-file',
+			'--internal-print-flags',
+			'--pdf-margin=1in,,1in,0.5in',
+		]),
+		error => {
+			assert.ok(error.stderr.includes('empty values not allowed'));
+			assert.equal(error.exitCode, 1);
+			return true;
+		},
+	);
+});
+
+test('logConsole flag works without errors', async () => {
+	const server = await createTestServer();
+
+	server.get('/', (request, response) => {
+		response.end(createHtmlPage(`
+			<script>
+				console.log('test log message');
+				console.warn('test warning');
+				console.error('test error');
+			</script>
+		`));
+	});
+
+	const {stdout} = await execa(cliPath, [
+		server.url,
+		'--log-console',
+		'--timeout=10',
+	], {encoding: 'buffer'});
+
+	const {mime} = await fileTypeFromBuffer(stdout);
+	assert.equal(mime, 'image/png');
+
+	await server.close();
+});
+
+test('referrer option sets custom referrer', async () => {
+	const server = await createTestServer();
+
+	server.get('/', (request, response) => {
+		const referrer = request.headers.referer || 'none';
+		response.end(createHtmlPage(`<div id="referrer">${referrer}</div>`));
+	});
+
+	const {stdout} = await execa(cliPath, [
+		server.url,
+		'--referrer=https://example.com',
+		'--timeout=10',
+	], {encoding: 'buffer'});
+
+	const {mime} = await fileTypeFromBuffer(stdout);
+	assert.equal(mime, 'image/png');
+
+	await server.close();
+});
+
+test('preloadLazyContent flag works', async () => {
+	const server = await createTestServer();
+
+	server.get('/', (request, response) => {
+		response.end(createHtmlPage(`
+			<div style="height: 2000px;">Top content</div>
+			<img loading="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="lazy">
+		`));
+	});
+
+	const {stdout} = await execa(cliPath, [
+		server.url,
+		'--preload-lazy-content',
+		'--timeout=10',
+	], {encoding: 'buffer'});
+
+	const {mime} = await fileTypeFromBuffer(stdout);
+	assert.equal(mime, 'image/png');
+
+	await server.close();
 });
 
 // Clean up test-temp directory after all tests

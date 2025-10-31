@@ -63,6 +63,14 @@ $ capture-website --help
     --allow-cors             Allow cross-origin requests (useful for local HTML files)
     --wait-for-network-idle  Wait for network connections to finish
     --insecure               Accept self-signed and invalid SSL certificates
+    --preload-lazy-content   Scroll through entire page to trigger lazy-loaded content before capture
+    --referrer               Custom referrer header for navigation
+    --throw-on-http-error    Throw error on non-2xx HTTP status codes
+    --log-console            Redirect page console output to terminal
+    --pdf-format             Paper format: letter|legal|tabloid|ledger|a0|a1|a2|a3|a4|a5|a6  [default: letter]
+    --pdf-landscape          Use landscape orientation for PDF
+    --pdf-margin             Page margins. Accepts a number/string or four comma-separated values for top, right, bottom, and left.
+    --pdf-background         Include background graphics in PDF
 
   Examples
     $ capture-website https://sindresorhus.com --output=screenshot.png
@@ -105,6 +113,15 @@ $ capture-website --help
     --allow-cors
     --wait-for-network-idle
     --insecure
+    --preload-lazy-content
+    --referrer="https://google.com"
+    --throw-on-http-error
+    --log-console
+    --pdf-format=a4
+    --pdf-landscape
+    --pdf-margin=1in
+    --pdf-margin=1in,0.5in,1in,0.5in
+    --pdf-background
     --auto-output
 ```
 

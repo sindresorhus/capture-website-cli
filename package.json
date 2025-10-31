@@ -41,10 +41,10 @@
 		"jpg"
 	],
 	"dependencies": {
-		"capture-website": "^5.0.0",
+		"capture-website": "^5.1.0",
 		"filenamify-url": "^4.0.0",
 		"get-stdin": "^9.0.0",
-		"meow": "^13.2.0",
+		"meow": "^14.0.0",
 		"split-on-first": "^4.0.0",
 		"unused-filename": "^4.0.1"
 	},
@@ -52,6 +52,6 @@
 		"create-test-server": "^3.0.1",
 		"execa": "^9.6.0",
 		"file-type": "^21.0.0",
-		"xo": "^1.2.2"
+		"xo": "^1.2.3"
 	}
 }
